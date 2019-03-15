@@ -1,7 +1,8 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.5'
+    id 'org.jetbrains.intellij' version '0.3.12'
 }
+
 
 group 'ru.uniteller.plugin'
 version '0.0.1a'
@@ -17,7 +18,10 @@ dependencies {
 }
 
 intellij {
-    version '2018.3.5'
+    version ideaVersion
+    plugins = [
+            "com.jetbrains.php:${phpPluginVersion}"
+    ]
 }
 patchPluginXml {
     changeNotes """
