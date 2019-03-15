@@ -1,5 +1,6 @@
 package ru.uniteller.plugin.resolver.reference;
 
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
@@ -40,7 +41,15 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
         String methodName = methodReference.getName().replace("get", "").replace("set", "").replace("has", "");
 
         methodName = Character.toLowerCase(methodName.charAt(0)) + methodName.substring(1);
-        String nameOfDto = ((MethodReference) methodReference.getClassReference()).getParameters()[0].getText().replace("::class", "");
+        PsiElement[] parameters = this.getFirstMethodReference(methodReference).getParameters();
+        if (parameters.length != 1) {
+            return phpNamedElements;
+        }
+        if (parameters[0].getChildren().length != 1) {
+            return phpNamedElements;
+        }
+
+        String nameOfDto = ((ClassReference) parameters[0].getChildren()[0]).getDeclaredType().toString();
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
         PhpClass phpClass = (PhpClass) phpIndex.getClassesByFQN(nameOfDto).toArray()[0];
         for (Field field : phpClass.getFields()) {
@@ -49,5 +58,17 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
             }
         }
         return phpNamedElements;
+    }
+
+    private MethodReference getFirstMethodReference(MethodReference methodReference){
+        PsiElement buffer = methodReference;
+        while (buffer != null){
+             if (buffer.getFirstChild() instanceof MethodReference){
+                 buffer = buffer.getFirstChild();
+             }else{
+                 break;
+             }
+        }
+        return (MethodReference) buffer;
     }
 }

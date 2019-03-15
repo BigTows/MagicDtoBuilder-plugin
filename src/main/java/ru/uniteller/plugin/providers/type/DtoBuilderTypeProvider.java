@@ -3,6 +3,7 @@ package ru.uniteller.plugin.providers.type;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
@@ -24,13 +25,19 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Override
     public PhpType getType(PsiElement psiElement) {
 
-        if (psiElement instanceof MethodReference && isMagicMethodDtoBuilder((MethodReference) psiElement)) {
-
-            PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder((MethodReference) psiElement);
-            if (phpClass == null) {
-                return null;
+        if (psiElement instanceof MethodReference) {
+            MethodReference methodReference = (MethodReference) psiElement;
+            PhpType phpType = null;
+            if (isMagicMethodDtoBuilder(methodReference)) {
+                PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder(methodReference);
+                if (phpClass != null) {
+                    phpType = PhpType.builder().add(phpClass.getFQN() + "Builder").build();
+                }
+            } else if (isMagicSetterMethodDtoBuilder(methodReference)) {
+                phpType = PhpType.builder().add("\\App\\Library\\ExampleApi\\ExampleDto" + "Builder").build();
             }
-            return PhpType.builder().add(phpClass.getFQN() + "Builder").build();
+
+            return phpType;
         }
 
         return null;
@@ -46,6 +53,11 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         return methodReference.getSignature().equals(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getParameters().length == 1;
     }
 
+    private boolean isMagicSetterMethodDtoBuilder(MethodReference methodReference) {
+        String data = methodReference.getText();
+        return methodReference.getSignature().contains(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getName().contains("set");
+    }
+
     /**
      * Get php class by parameter of magic method dto builder
      *
@@ -55,7 +67,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Nullable
     private PhpClass getPhpClassByParameterMagicMethodDtoBuilder(MethodReference methodReference) {
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
-        String FQN = methodReference.getParameters()[0].getText().replace("::class", "");
+        String FQN = ((ClassReference)methodReference.getParameters()[0].getFirstChild()).getDeclaredType().toString();
         for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
             return phpClass;
         }
