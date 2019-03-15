@@ -14,7 +14,7 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <completion.contributor language="PHP" implementationClass="ru.uniteller.plugin.completion.CompletionContributor"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
