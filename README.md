@@ -1,0 +1,1 @@
+MagicDtoBuilder-plugin
