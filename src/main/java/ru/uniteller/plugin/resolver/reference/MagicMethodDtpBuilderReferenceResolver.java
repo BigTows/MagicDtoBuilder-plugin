@@ -1,14 +1,16 @@
 package ru.uniteller.plugin.resolver.reference;
 
-import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
 import org.jetbrains.annotations.Nullable;
+import ru.uniteller.plugin.providers.type.DtoBuilderTypeProvider;
+import ru.uniteller.plugin.utils.MethodReferenceUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Reference magic method for DtoBuilder
@@ -42,22 +44,20 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
         if (null == methodName) {
             return phpNamedElements;
         }
-        PsiElement[] parameters = this.getFirstMethodReference(methodReference).getParameters();
-        if (parameters.length != 1) {
-            return phpNamedElements;
-        }
-        if (parameters[0].getChildren().length != 1) {
-            return phpNamedElements;
-        }
 
-        String nameOfDto = ((ClassReference) parameters[0].getChildren()[0]).getDeclaredType().toString();
+        String[] declaredTypes = MethodReferenceUtils.getFirstMethodReference(methodReference).getDeclaredType().toString().split(Pattern.quote("|"));
+        String declaredType = declaredTypes[declaredTypes.length - 2];
+        String FQN = declaredType.substring(0, declaredType.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
-        PhpClass phpClass = (PhpClass) phpIndex.getClassesByFQN(nameOfDto).toArray()[0];
-        for (Field field : phpClass.getFields()) {
-            if (field.getName().equals(methodName)) {
-                phpNamedElements.add(field);
+        Collection<PhpClass> phpClasses = phpIndex.getClassesByFQN(FQN);
+
+        phpClasses.forEach(phpClass -> {
+            for (Field field : phpClass.getFields()) {
+                if (field.getName().equals(methodName)) {
+                    phpNamedElements.add(field);
+                }
             }
-        }
+        });
         return phpNamedElements;
     }
 
@@ -90,17 +90,5 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
      */
     private boolean isPrefixProviderMethod(String prefix) {
         return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
-    }
-
-    private MethodReference getFirstMethodReference(MethodReference methodReference) {
-        PsiElement buffer = methodReference;
-        while (buffer != null) {
-            if (buffer.getFirstChild() instanceof MethodReference) {
-                buffer = buffer.getFirstChild();
-            } else {
-                break;
-            }
-        }
-        return (MethodReference) buffer;
     }
 }

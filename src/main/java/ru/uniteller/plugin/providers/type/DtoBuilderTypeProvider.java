@@ -1,5 +1,6 @@
 package ru.uniteller.plugin.providers.type;
 
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
@@ -11,11 +12,22 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import org.jetbrains.annotations.Nullable;
 import ru.uniteller.plugin.resolver.reference.MagicMethodDtpBuilderReferenceResolver;
+import ru.uniteller.plugin.utils.MethodReferenceUtils;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
+
+    /**
+     * Post data for DTO builder.
+     * <p>
+     * If we have Dto "ExampleDto", when builder Dto will be like "ExampleDto"+{@code POSTFIX_BUILDER_DTO}
+     * </p>
+     */
+    public static final String POSTFIX_BUILDER_DTO = "Builder";
+
     @Override
     public char getKey() {
         return 'D';
@@ -31,10 +43,12 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             if (isMagicMethodDtoBuilder(methodReference)) {
                 PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder(methodReference);
                 if (phpClass != null) {
-                    phpType = PhpType.builder().add(phpClass.getFQN() + "Builder").build();
+                    phpType = PhpType.builder().add(phpClass.getFQN() + POSTFIX_BUILDER_DTO).build();
                 }
             } else if (isMagicSetterMethodDtoBuilder(methodReference)) {
-                phpType = PhpType.builder().add("\\App\\Library\\ExampleApi\\ExampleDto" + "Builder").build();
+                phpType = PhpType.builder().add(
+                        this.findMagicDtoBuilderByDeclarationType(MethodReferenceUtils.getDeclaredTypeAtRootByMethodReference(methodReference))
+                ).build();
             }
 
             return phpType;
@@ -67,11 +81,25 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Nullable
     private PhpClass getPhpClassByParameterMagicMethodDtoBuilder(MethodReference methodReference) {
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
-        String FQN = ((ClassReference)methodReference.getParameters()[0].getFirstChild()).getDeclaredType().toString();
-        for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
-            return phpClass;
+        String FQN = ((ClassReference) methodReference.getParameters()[0].getFirstChild()).getDeclaredType().toString();
+        try {
+            for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
+                return phpClass;
+            }
+        } catch (IndexNotReadyException ignore) {
         }
         return null;
+    }
+
+    private String findMagicDtoBuilderByDeclarationType(PhpType declaredType) {
+        String[] types = declaredType.toString().split(Pattern.quote("|"));
+
+        for (int i = types.length - 1; i != 0; i--) {
+            if (!types[i].equals("?")) {
+                return types[i];
+            }
+        }
+        return "";
     }
 
 
