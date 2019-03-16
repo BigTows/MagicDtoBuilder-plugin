@@ -38,9 +38,10 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
     private List<PhpNamedElement> getReferenceForMagicMethodBuilder(MethodReference methodReference) {
         List<PhpNamedElement> phpNamedElements = new ArrayList<>();
 
-        String methodName = methodReference.getName().replace("get", "").replace("set", "").replace("has", "");
-
-        methodName = Character.toLowerCase(methodName.charAt(0)) + methodName.substring(1);
+        String methodName = this.getNameFieldByProvidersMethod(methodReference);
+        if (null == methodName) {
+            return phpNamedElements;
+        }
         PsiElement[] parameters = this.getFirstMethodReference(methodReference).getParameters();
         if (parameters.length != 1) {
             return phpNamedElements;
@@ -60,14 +61,45 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
         return phpNamedElements;
     }
 
-    private MethodReference getFirstMethodReference(MethodReference methodReference){
+    /**
+     * Return name field class by provider method reference
+     *
+     * @param providerMethodReference method class like: "set", "get", "has"
+     * @return name of field
+     * //TODO mb need, move to utils package
+     */
+    @Nullable
+    private String getNameFieldByProvidersMethod(MethodReference providerMethodReference) {
+        String nameField = providerMethodReference.getName();
+        if (null == nameField || nameField.length() < 4) {
+            return null;
+        }
+        StringBuilder nameFieldBuilder = new StringBuilder(nameField);
+        if (!this.isPrefixProviderMethod(nameFieldBuilder.substring(0, 3))) {
+            return null;
+        }
+        nameFieldBuilder.delete(0, 3);
+        return Character.toLowerCase(nameFieldBuilder.charAt(0)) + nameFieldBuilder.substring(1);
+    }
+
+    /**
+     * Detect is prefix provider
+     *
+     * @param prefix prefix of method
+     * @return {@code true} if prefix same provider method else {@code false}
+     */
+    private boolean isPrefixProviderMethod(String prefix) {
+        return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
+    }
+
+    private MethodReference getFirstMethodReference(MethodReference methodReference) {
         PsiElement buffer = methodReference;
-        while (buffer != null){
-             if (buffer.getFirstChild() instanceof MethodReference){
-                 buffer = buffer.getFirstChild();
-             }else{
-                 break;
-             }
+        while (buffer != null) {
+            if (buffer.getFirstChild() instanceof MethodReference) {
+                buffer = buffer.getFirstChild();
+            } else {
+                break;
+            }
         }
         return (MethodReference) buffer;
     }
