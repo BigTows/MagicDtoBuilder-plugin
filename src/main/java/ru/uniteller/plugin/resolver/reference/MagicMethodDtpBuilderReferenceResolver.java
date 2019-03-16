@@ -32,7 +32,7 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
                 return this.getReferenceForMagicMethodBuilder(methodReference);
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private List<PhpNamedElement> getReferenceForMagicMethodBuilder(MethodReference methodReference) {
