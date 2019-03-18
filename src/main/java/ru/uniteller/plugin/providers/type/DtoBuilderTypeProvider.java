@@ -18,6 +18,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * Type provider for magic dto builder
+ */
 public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
 
     /**
@@ -67,8 +70,16 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         return methodReference.getSignature().equals(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getParameters().length == 1;
     }
 
+    /**
+     * Detect setter method of magic dto builder
+     *
+     * @param methodReference method reference
+     * @return {@code true} if is setter method and is part of magic dto builder
+     */
     private boolean isMagicSetterMethodDtoBuilder(MethodReference methodReference) {
-        String data = methodReference.getText();
+        if (null == methodReference.getName()) {
+            return false;
+        }
         return methodReference.getSignature().contains(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getName().contains("set");
     }
 
@@ -104,7 +115,6 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
 
 
     @Override
-
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
         return null;
     }
