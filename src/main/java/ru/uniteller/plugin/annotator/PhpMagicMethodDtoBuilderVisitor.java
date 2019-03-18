@@ -38,7 +38,6 @@ public class PhpMagicMethodDtoBuilderVisitor extends PhpElementVisitor {
             }
         }*/
      //annotationHolder.createWarningAnnotation()
-     annotationHolder.createAnnotation(HighlightSeverity.INFO, reference.getTextRange(),"A");
         super.visitPhpMethodReference(reference);
     }
 
