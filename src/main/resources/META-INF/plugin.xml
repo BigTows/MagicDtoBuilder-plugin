@@ -17,7 +17,7 @@
         <completion.contributor language="PHP"
                                 implementationClass="ru.uniteller.plugin.completion.CompletionContributor"/>
 
-        <annotator language="PHP" implementationClass="ru.I"/>
+        <annotator language="PHP" implementationClass="ru.uniteller.plugin.annotator.MagicMethodDtoBuilderAnnotator" order="last"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
