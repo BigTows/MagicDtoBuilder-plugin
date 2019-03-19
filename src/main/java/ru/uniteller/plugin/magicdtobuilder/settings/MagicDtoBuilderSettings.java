@@ -19,6 +19,8 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Pattern;
+
 @State(
         name = "MagicDtoBuilderSettings",
         storages = {
@@ -60,5 +62,9 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
      */
     public String getSignatureMethodMagicDtoBuilderCreate() {
         return signatureMethodMagicDtoBuilderCreate;
+    }
+
+    public String getSignatureMagicDtoBuilder(){
+       return signatureMethodMagicDtoBuilderCreate.replace("#M#C","").split(Pattern.quote("."))[0];
     }
 }

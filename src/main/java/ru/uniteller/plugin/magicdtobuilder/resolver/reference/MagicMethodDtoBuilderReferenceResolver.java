@@ -13,12 +13,9 @@ package ru.uniteller.plugin.magicdtobuilder.resolver.reference;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
-import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +34,7 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
         if (phpReference instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) phpReference;
             PhpExpression phpExpression = methodReference.getClassReference();
-            if (phpExpression != null && phpExpression.getDeclaredType().toString().contains(this.getSignatureMethodCreate(phpExpression))) {
+            if (phpExpression != null && phpExpression.getDeclaredType().toString().contains(this.getSignatureMagicDtoBuilder(phpExpression))) {
                 return this.getReferenceForMagicMethodBuilder(methodReference);
             }
         }
@@ -51,17 +48,18 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
         if (null == methodName) {
             return phpNamedElements;
         }
-        String[] declaredTypes;
-        if (methodReference.getFirstChild() instanceof MethodReference) {
-            declaredTypes = ((MethodReferenceImpl) methodReference.getFirstChild()).getDeclaredType().toString().split(Pattern.quote("|"));
+        String[] declaredTypes = new String[0];
+        PsiElement firstChildElement = methodReference.getFirstChild();
+        if (firstChildElement instanceof MethodReference || firstChildElement instanceof Variable) {
+            declaredTypes = ((PhpReference) firstChildElement).getDeclaredType().toString().split(Pattern.quote("|"));
+        }
+        String FQN;
+        if (declaredTypes[declaredTypes.length - 1].equals("?")) {
+            //is local variable
+            FQN = declaredTypes[declaredTypes.length - 2];
         } else {
-            declaredTypes = MethodReferenceUtils.getFirstMethodReference(methodReference).getDeclaredType().toString().split(Pattern.quote("|"));
+            FQN = declaredTypes[declaredTypes.length - 1];
         }
-        String declaredType = declaredTypes[declaredTypes.length - 2];
-        if (declaredType.length() < DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length()) {
-            return phpNamedElements;
-        }
-        String FQN = declaredType.substring(0, declaredType.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
         Collection<PhpClass> phpClasses = phpIndex.getClassesByFQN(FQN);
 
@@ -108,14 +106,14 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
     }
 
     /**
-     * Get signature for method create magic dto builder
+     * Get signature for magic dto builder
      *
      * @param element any Psi element for get ProjectInstance
      * @return signature for method
      */
-    private String getSignatureMethodCreate(PsiElement element) {
+    private String getSignatureMagicDtoBuilder(PsiElement element) {
         return MagicDtoBuilderSettings.getInstance(
                 element.getProject()
-        ).getSignatureMethodMagicDtoBuilderCreate();
+        ).getSignatureMagicDtoBuilder();
     }
 }

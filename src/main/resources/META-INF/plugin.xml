@@ -27,8 +27,17 @@
         <completion.contributor language="PHP"
                                 implementationClass="ru.uniteller.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
 
-        <annotator language="PHP" implementationClass="ru.uniteller.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator" order="last"/>
+        <annotator language="PHP"
+                   implementationClass="ru.uniteller.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator"
+                   order="last"/>
         <projectService serviceImplementation="ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
+
+        <localInspection groupPath="MagicDtoBuilder" shortName="NotFoundDtoType"
+                         displayName="Not found Dto Type in PHPDoc"
+                         groupName="NotFoundDtoTypeInPhpDocParamTag"
+                         enabledByDefault="true" level="WARNING"
+                         language="PHP"
+                         implementationClass="ru.uniteller.plugin.magicdtobuilder.inspection.local.NotFoundDtoTypeInPhpDocParamTagLocalInspector"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

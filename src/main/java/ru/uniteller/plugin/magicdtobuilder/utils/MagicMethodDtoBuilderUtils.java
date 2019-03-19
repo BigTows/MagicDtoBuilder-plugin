@@ -92,7 +92,7 @@ public class MagicMethodDtoBuilderUtils {
         }
         String signatureMethodCreate = MagicDtoBuilderSettings.getInstance(
                 methodReference.getProject()
-        ).getSignatureMethodMagicDtoBuilderCreate();
+        ).getSignatureMagicDtoBuilder();
 
         return methodReference.getSignature().contains(signatureMethodCreate) && methodName.substring(0, prefix.length()).equals(prefix);
     }

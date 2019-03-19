@@ -10,15 +10,17 @@
 
 package ru.uniteller.plugin.magicdtobuilder.providers.type;
 
+import com.google.errorprone.annotations.Var;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ParameterImpl;
+import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 
@@ -47,14 +49,13 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Nullable
     @Override
     public PhpType getType(PsiElement psiElement) {
-
+        PhpType phpType = null;
         if (psiElement instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) psiElement;
-            PhpType phpType = null;
             if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
                 PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder(methodReference);
                 if (phpClass != null) {
-                    phpType = PhpType.builder().add(phpClass.getFQN() + POSTFIX_BUILDER_DTO).build();
+                    phpType = PhpType.builder().add(phpClass.getFQN()).build();
                 }
             } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
                 phpType = PhpType.builder().add(
@@ -68,11 +69,9 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
                 phpType = PhpType.BOOLEAN;
             }
-
-            return phpType;
         }
 
-        return null;
+        return phpType;
     }
 
     /**

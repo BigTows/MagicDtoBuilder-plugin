@@ -21,7 +21,6 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
@@ -84,7 +83,7 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
 
         PhpClass phpClass = getDtoClassByPsiElement(parameters.getOriginalPosition());
 
-        if (phpClass==null){
+        if (phpClass == null) {
             return;
         }
         phpClass.getFields().forEach(field ->
@@ -104,9 +103,8 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
         String FQN = null;
         if (prevNamedElement instanceof MethodReference) {
             if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) prevNamedElement)) {
-                String[] types = ((MethodReference) element).getDeclaredType().toString().split(Pattern.quote("|"));
-                String type = types[types.length - 2];
-                FQN = type.substring(0, type.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
+                String[] types = ((MethodReference) prevNamedElement).getDeclaredType().toString().split(Pattern.quote("|"));
+                FQN = types[types.length - 2];
             } else {
                 MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) prevNamedElement);
                 if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
@@ -135,18 +133,17 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
     @Nullable
     private String getClassesFQNByVariableMagicDtoBuilder(Variable variable) {
         String[] stringTypes = variable.getDeclaredType().toString().split(Pattern.quote("|"));
-        if (stringTypes.length != 3) {
-            return null;
+        MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(variable.getProject());
+        if (stringTypes[stringTypes.length - 1].equals("?")) {
+            //is locale variable
+            if (stringTypes.length == 3 && stringTypes[0].equals(settings.getSignatureMethodMagicDtoBuilderCreate())) {
+                return stringTypes[1];
+            }
+        } else if (stringTypes.length == 2 && stringTypes[0].equals(settings.getSignatureMagicDtoBuilder())) {
+            //is parameter variable
+            return stringTypes[1];
         }
-        String signatureCreateMethod =
-                MagicDtoBuilderSettings.getInstance(variable.getProject())
-                        .getSignatureMethodMagicDtoBuilderCreate();
-        if (!stringTypes[2].equals("?") || !stringTypes[0].equals(signatureCreateMethod)) {
-            return null;
-        }
-        String FQN = stringTypes[1].substring(0, stringTypes[1].length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
-
-        return FQN;
+        return null;
     }
 
     /**
