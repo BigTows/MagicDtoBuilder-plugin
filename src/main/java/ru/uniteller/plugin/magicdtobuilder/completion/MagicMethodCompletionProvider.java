@@ -2,7 +2,7 @@
  * Copyright (c) MagicDtoBuilder-plugin (2019)
  *
  * Authors:
- *    Andrey Malofeykin
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
  *    Alexander <gasfull98@gmail.com> Chapchuk
  *
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
@@ -25,6 +25,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
@@ -46,22 +47,26 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
         PsiElement element = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
         final Project project = element.getProject();
         final PhpIndex phpIndex = PhpIndex.getInstance(project);
-        final MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(project);
 
         if (element instanceof MethodReference) {
             MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) element);
-            if (root.getSignature().equals(settings.getSignatureMethodMagicDtoBuilderCreate())) {
+            if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
                 //Is magic dto builder.
-                if (root.getParameters().length != 1 && !(root.getParameters()[0] instanceof ClassConstantReference)) {
-                    return;
-                }
                 ClassConstantReference classConstantReference = (ClassConstantReference) root.getParameters()[0];
                 if (classConstantReference.getClassReference() == null) {
                     return;
                 }
                 String FQN = classConstantReference.getClassReference().getDeclaredType().toString();
                 for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
-                    phpClass.getFields().forEach(field -> result.addAllElements(this.createLookupElementByField(field)));
+
+                    if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) element)) {
+                        phpClass.getFields().forEach(field ->
+                                result.addElement(this.createSetterMethodLookupElementByField(field))
+                        );
+                        phpClass.getFields().forEach(field ->
+                                result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
+                        );
+                    }
                 }
             }
         }
@@ -73,15 +78,17 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
      * @param field field on the basis of which creating lookup elements
      * @return lookup elements
      */
-    private List<LookupElement> createLookupElementByField(@NotNull Field field) {
+    private LookupElement createSetterMethodLookupElementByField(@NotNull Field field) {
+        String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
+
+        return LookupElementBuilder.create("set" + preparedNameField + "()")
+                .withPresentableText("set" + preparedNameField + "($" + field.getName() + ")")
+                .withIcon(field.getIcon());
+    }
+
+    private List<LookupElement> createDataProviderMethodLookupElementByField(@NotNull Field field) {
         List<LookupElement> lookupElements = new ArrayList<>();
         String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
-        lookupElements.add(
-                LookupElementBuilder.create("set" + preparedNameField + "()")
-                        .withPresentableText("set" + preparedNameField + "($" + field.getName() + ")")
-                        .withIcon(field.getIcon())
-        );
-
         lookupElements.add(
                 LookupElementBuilder.create("get" + preparedNameField + "()")
                         .withPresentableText("get" + preparedNameField + "()")

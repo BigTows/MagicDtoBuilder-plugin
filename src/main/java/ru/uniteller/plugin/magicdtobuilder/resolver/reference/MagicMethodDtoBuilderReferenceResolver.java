@@ -2,7 +2,7 @@
  * Copyright (c) MagicDtoBuilder-plugin (2019)
  *
  * Authors:
- *    Andrey Malofeykin
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
  *    Alexander <gasfull98@gmail.com> Chapchuk
  *
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
@@ -13,6 +13,7 @@ package ru.uniteller.plugin.magicdtobuilder.resolver.reference;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
 import org.jetbrains.annotations.Nullable;
 import ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
@@ -50,9 +51,16 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
         if (null == methodName) {
             return phpNamedElements;
         }
-
-        String[] declaredTypes = MethodReferenceUtils.getFirstMethodReference(methodReference).getDeclaredType().toString().split(Pattern.quote("|"));
+        String[] declaredTypes;
+        if (methodReference.getFirstChild() instanceof MethodReference) {
+            declaredTypes = ((MethodReferenceImpl) methodReference.getFirstChild()).getDeclaredType().toString().split(Pattern.quote("|"));
+        } else {
+            declaredTypes = MethodReferenceUtils.getFirstMethodReference(methodReference).getDeclaredType().toString().split(Pattern.quote("|"));
+        }
         String declaredType = declaredTypes[declaredTypes.length - 2];
+        if (declaredType.length() < DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length()) {
+            return phpNamedElements;
+        }
         String FQN = declaredType.substring(0, declaredType.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
         Collection<PhpClass> phpClasses = phpIndex.getClassesByFQN(FQN);
@@ -64,6 +72,7 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
                 }
             }
         });
+
         return phpNamedElements;
     }
 

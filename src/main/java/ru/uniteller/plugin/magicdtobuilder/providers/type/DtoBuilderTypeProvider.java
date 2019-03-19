@@ -2,7 +2,7 @@
  * Copyright (c) MagicDtoBuilder-plugin (2019)
  *
  * Authors:
- *    Andrey Malofeykin
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
  *    Alexander <gasfull98@gmail.com> Chapchuk
  *
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
@@ -14,10 +14,7 @@ import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.ClassReference;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +51,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         if (psiElement instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) psiElement;
             PhpType phpType = null;
-            if (isCreateMethodDtoBuilder(methodReference)) {
+            if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
                 PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder(methodReference);
                 if (phpClass != null) {
                     phpType = PhpType.builder().add(phpClass.getFQN() + POSTFIX_BUILDER_DTO).build();
@@ -63,27 +60,19 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
                 phpType = PhpType.builder().add(
                         this.findMagicDtoBuilderByDeclarationType(MethodReferenceUtils.getDeclaredTypeAtRootByMethodReference(methodReference))
                 ).build();
+            } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
+                PsiElement resolveElement = methodReference.resolve();
+                if (resolveElement instanceof Field) {
+                    phpType = PhpType.builder().add(((Field) resolveElement).getDeclaredType()).build();
+                }
+            } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
+                phpType = PhpType.BOOLEAN;
             }
 
             return phpType;
         }
 
         return null;
-    }
-
-    /**
-     * Detect magic method dto builder
-     *
-     * @param methodReference method reference
-     * @return {@code true} is magic method dto builder else {@code false}
-     */
-    private boolean isCreateMethodDtoBuilder(MethodReference methodReference) {
-        String signatureMethodCreate = MagicDtoBuilderSettings.getInstance(
-                methodReference.getProject()
-        ).getSignatureMethodMagicDtoBuilderCreate();
-
-        return methodReference.getSignature().equals(signatureMethodCreate)
-                && methodReference.getParameters().length == 1;
     }
 
     /**

@@ -2,7 +2,7 @@
  * Copyright (c) MagicDtoBuilder-plugin (2019)
  *
  * Authors:
- *    Andrey Malofeykin
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
  *    Alexander <gasfull98@gmail.com> Chapchuk
  *
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
@@ -10,7 +10,6 @@
 
 package ru.uniteller.plugin.magicdtobuilder.settings;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;

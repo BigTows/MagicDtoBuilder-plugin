@@ -2,7 +2,7 @@
  * Copyright (c) MagicDtoBuilder-plugin (2019)
  *
  * Authors:
- *    Andrey Malofeykin
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
  *    Alexander <gasfull98@gmail.com> Chapchuk
  *
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
@@ -10,6 +10,7 @@
 
 package ru.uniteller.plugin.magicdtobuilder.utils;
 
+import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 
@@ -17,6 +18,25 @@ import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
  * Utils method's for best development
  */
 public class MagicMethodDtoBuilderUtils {
+
+
+
+
+    /**
+     * Detect magic method dto builder
+     *
+     * @param methodReference method reference
+     * @return {@code true} is magic method dto builder else {@code false}
+     */
+    public static boolean isCreateMethodDtoBuilder(MethodReference methodReference) {
+        String signatureMethodCreate = MagicDtoBuilderSettings.getInstance(
+                methodReference.getProject()
+        ).getSignatureMethodMagicDtoBuilderCreate();
+
+        return methodReference.getSignature().equals(signatureMethodCreate)
+                && methodReference.getParameters().length == 1
+                && methodReference.getParameters()[0] instanceof ClassConstantReference;
+    }
 
     /**
      * Detect any magic method in method reference
