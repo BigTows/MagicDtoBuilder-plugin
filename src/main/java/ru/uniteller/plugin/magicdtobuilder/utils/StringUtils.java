@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.utils;
+package ru.uniteller.plugin.magicdtobuilder.utils;
 
 public class StringUtils {
 

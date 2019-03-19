@@ -1,11 +1,13 @@
-package ru.uniteller.plugin.resolver.reference;
+package ru.uniteller.plugin.magicdtobuilder.resolver.reference;
 
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.providers.type.DtoBuilderTypeProvider;
-import ru.uniteller.plugin.utils.MethodReferenceUtils;
+import ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
+import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,13 +17,7 @@ import java.util.regex.Pattern;
 /**
  * Reference magic method for DtoBuilder
  */
-public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResolver {
-
-    /**
-     * Signature for method create at DTO Builder
-     * TODO replace this to settings
-     */
-    public static final String SIGNATURE_METHOD_CREATE = "#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create";
+public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResolver {
 
     @Override
     @Nullable
@@ -30,7 +26,7 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
         if (phpReference instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) phpReference;
             PhpExpression phpExpression = methodReference.getClassReference();
-            if (phpExpression != null && phpExpression.getDeclaredType().toString().contains(SIGNATURE_METHOD_CREATE)) {
+            if (phpExpression != null && phpExpression.getDeclaredType().toString().contains(this.getSignatureMethodCreate(phpExpression))) {
                 return this.getReferenceForMagicMethodBuilder(methodReference);
             }
         }
@@ -90,5 +86,17 @@ public class MagicMethodDtpBuilderReferenceResolver implements PhpReferenceResol
      */
     private boolean isPrefixProviderMethod(String prefix) {
         return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
+    }
+
+    /**
+     * Get signature for method create magic dto builder
+     *
+     * @param element any Psi element for get ProjectInstance
+     * @return signature for method
+     */
+    private String getSignatureMethodCreate(PsiElement element) {
+        return MagicDtoBuilderSettings.getInstance(
+                element.getProject()
+        ).getSignatureMethodMagicDtoBuilderCreate();
     }
 }

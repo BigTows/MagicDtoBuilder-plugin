@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.providers.type;
+package ru.uniteller.plugin.magicdtobuilder.providers.type;
 
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
@@ -11,8 +11,9 @@ import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.resolver.reference.MagicMethodDtpBuilderReferenceResolver;
-import ru.uniteller.plugin.utils.MethodReferenceUtils;
+import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 
 import java.util.Collection;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
                 if (phpClass != null) {
                     phpType = PhpType.builder().add(phpClass.getFQN() + POSTFIX_BUILDER_DTO).build();
                 }
-            } else if (isMagicSetterMethodDtoBuilder(methodReference)) {
+            } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
                 phpType = PhpType.builder().add(
                         this.findMagicDtoBuilderByDeclarationType(MethodReferenceUtils.getDeclaredTypeAtRootByMethodReference(methodReference))
                 ).build();
@@ -67,20 +68,12 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
      * @return {@code true} is magic method dto builder else {@code false}
      */
     private boolean isMagicMethodDtoBuilder(MethodReference methodReference) {
-        return methodReference.getSignature().equals(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getParameters().length == 1;
-    }
+        String signatureMethodCreate = MagicDtoBuilderSettings.getInstance(
+                methodReference.getProject()
+        ).getSignatureMethodMagicDtoBuilderCreate();
 
-    /**
-     * Detect setter method of magic dto builder
-     *
-     * @param methodReference method reference
-     * @return {@code true} if is setter method and is part of magic dto builder
-     */
-    private boolean isMagicSetterMethodDtoBuilder(MethodReference methodReference) {
-        if (null == methodReference.getName()) {
-            return false;
-        }
-        return methodReference.getSignature().contains(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE) && methodReference.getName().contains("set");
+        return methodReference.getSignature().equals(signatureMethodCreate)
+                && methodReference.getParameters().length == 1;
     }
 
     /**

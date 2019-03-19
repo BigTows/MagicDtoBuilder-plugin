@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.utils;
+package ru.uniteller.plugin.magicdtobuilder.utils;
 
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;

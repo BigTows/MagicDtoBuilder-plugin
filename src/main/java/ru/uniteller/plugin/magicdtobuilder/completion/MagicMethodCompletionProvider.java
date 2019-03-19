@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.completion;
+package ru.uniteller.plugin.magicdtobuilder.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
@@ -14,9 +14,9 @@ import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
-import ru.uniteller.plugin.resolver.reference.MagicMethodDtpBuilderReferenceResolver;
-import ru.uniteller.plugin.utils.MethodReferenceUtils;
-import ru.uniteller.plugin.utils.StringUtils;
+import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
+import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +38,14 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
         final PsiElement element = parameters.getPosition();
         final Project project = element.getProject();
         final PhpIndex phpIndex = PhpIndex.getInstance(project);
+        final MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(project);
         if (parameters.getOriginalPosition() == null) {
             return;
         }
         PsiElement e = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
         if (e instanceof MethodReference) {
             MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) e);
-            if (root.getSignature().equals(MagicMethodDtpBuilderReferenceResolver.SIGNATURE_METHOD_CREATE)) {
+            if (root.getSignature().equals(settings.getSignatureMethodMagicDtoBuilderCreate())) {
                 //Is magic dto builder.
                 if (root.getParameters().length != 1 && !(root.getParameters()[0] instanceof ClassConstantReference)) {
                     return;

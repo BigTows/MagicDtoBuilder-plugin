@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.annotator;
+package ru.uniteller.plugin.magicdtobuilder.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;

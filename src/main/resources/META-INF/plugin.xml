@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>ru.uniteller.plugin.MagicDtoBuilder</id>
+    <id>ru.uniteller.plugin.magicdtobuilder.MagicDtoBuilder</id>
     <name>MagicDtoBuilder</name>
     <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
@@ -15,15 +15,16 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="PHP"
-                                implementationClass="ru.uniteller.plugin.completion.CompletionContributor"/>
+                                implementationClass="ru.uniteller.plugin.magicdtobuilder.completion.CompletionContributor"/>
 
-        <annotator language="PHP" implementationClass="ru.uniteller.plugin.annotator.MagicMethodDtoBuilderAnnotator" order="last"/>
+        <annotator language="PHP" implementationClass="ru.uniteller.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator" order="last"/>
+        <projectService serviceImplementation="ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
-        <typeProvider3 implementation="ru.uniteller.plugin.providers.type.DtoBuilderTypeProvider"/>
+        <typeProvider3 implementation="ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider"/>
         <referenceResolver
-                implementation="ru.uniteller.plugin.resolver.reference.MagicMethodDtpBuilderReferenceResolver"/>
+                implementation="ru.uniteller.plugin.magicdtobuilder.resolver.reference.MagicMethodDtoBuilderReferenceResolver"/>
     </extensions>
 
     <actions>

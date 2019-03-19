@@ -20,7 +20,8 @@ dependencies {
 intellij {
     version ideaVersion
     plugins = [
-            "com.jetbrains.php:${phpPluginVersion}"
+            "com.jetbrains.php:${phpPluginVersion}",
+           // "org.jetbrains.plugins.localization:${localizationPluginVersion}"
     ]
     updateSinceUntilBuild false
 }

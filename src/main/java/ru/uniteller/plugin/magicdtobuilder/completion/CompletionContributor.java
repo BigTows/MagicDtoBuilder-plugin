@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.completion;
+package ru.uniteller.plugin.magicdtobuilder.completion;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.PsiElementPattern;
