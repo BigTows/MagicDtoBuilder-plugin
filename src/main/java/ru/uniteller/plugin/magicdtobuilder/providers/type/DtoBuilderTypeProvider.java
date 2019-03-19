@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.uniteller.plugin.magicdtobuilder.providers.type;
 
 import com.intellij.openapi.project.IndexNotReadyException;
@@ -44,7 +54,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         if (psiElement instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) psiElement;
             PhpType phpType = null;
-            if (isMagicMethodDtoBuilder(methodReference)) {
+            if (isCreateMethodDtoBuilder(methodReference)) {
                 PhpClass phpClass = this.getPhpClassByParameterMagicMethodDtoBuilder(methodReference);
                 if (phpClass != null) {
                     phpType = PhpType.builder().add(phpClass.getFQN() + POSTFIX_BUILDER_DTO).build();
@@ -67,7 +77,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
      * @param methodReference method reference
      * @return {@code true} is magic method dto builder else {@code false}
      */
-    private boolean isMagicMethodDtoBuilder(MethodReference methodReference) {
+    private boolean isCreateMethodDtoBuilder(MethodReference methodReference) {
         String signatureMethodCreate = MagicDtoBuilderSettings.getInstance(
                 methodReference.getProject()
         ).getSignatureMethodMagicDtoBuilderCreate();

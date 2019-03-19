@@ -1,3 +1,13 @@
+<!--
+  ~ Copyright (c) MagicDtoBuilder-plugin (2019)
+  ~
+  ~ Authors:
+  ~    Andrey Malofeykin
+  ~    Alexander <gasfull98@gmail.com> Chapchuk
+  ~
+  ~ Licensed under the MIT License. See LICENSE file in the project root for license information.
+  -->
+
 <idea-plugin>
     <id>ru.uniteller.plugin.magicdtobuilder.MagicDtoBuilder</id>
     <name>MagicDtoBuilder</name>
@@ -15,7 +25,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="PHP"
-                                implementationClass="ru.uniteller.plugin.magicdtobuilder.completion.CompletionContributor"/>
+                                implementationClass="ru.uniteller.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
 
         <annotator language="PHP" implementationClass="ru.uniteller.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator" order="last"/>
         <projectService serviceImplementation="ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>

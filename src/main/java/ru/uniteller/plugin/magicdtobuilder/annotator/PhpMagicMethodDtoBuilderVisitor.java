@@ -1,10 +1,21 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.uniteller.plugin.magicdtobuilder.annotator;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.util.TextRange;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 
 import java.util.ArrayList;
@@ -32,16 +43,12 @@ public class PhpMagicMethodDtoBuilderVisitor extends PhpElementVisitor {
 
     @Override
     public void visitPhpMethodReference(MethodReference reference) {
-        if (!MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(reference)) {
-            return;
+        if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(reference)) {
+            this.checkSetterMagicOnMaintenanceParams(reference);
         }
-
-        this.checkSetterMagicOnMaintenanceParams(reference);
-
-        if (annotationHolder instanceof Collection) {
+        if (annotationHolder instanceof Collection && MagicMethodDtoBuilderUtils.isMagicMethodDtoBuilder(reference)) {
             this.removeAnnotationAboutMemberHasPrivateAccess((Collection) annotationHolder);
         }
-
         super.visitPhpMethodReference(reference);
     }
 
@@ -51,8 +58,14 @@ public class PhpMagicMethodDtoBuilderVisitor extends PhpElementVisitor {
      * @param reference method reference (setter magic)
      */
     private void checkSetterMagicOnMaintenanceParams(MethodReference reference) {
-        if (reference.getParameterList() != null && reference.getParameters().length == 0) {
-            annotationHolder.createErrorAnnotation(reference.getTextRange().shiftLeft(1),
+        ParameterList parameterList = reference.getParameterList();
+        if (parameterList != null && reference.getParameters().length == 0) {
+            TextRange textRangeParameterList = parameterList.getTextRange();
+            annotationHolder.createErrorAnnotation(
+                    TextRange.create(
+                            textRangeParameterList.getStartOffset() - 1,
+                            textRangeParameterList.getEndOffset() + 1
+                    ),
                     "Параметры забыл..."
             );
         }

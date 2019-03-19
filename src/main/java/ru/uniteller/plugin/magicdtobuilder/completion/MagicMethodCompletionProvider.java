@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.uniteller.plugin.magicdtobuilder.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
@@ -26,25 +36,20 @@ import java.util.List;
  */
 public class MagicMethodCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-    /**
-     * TODO refactor code...
-     *
-     * @param parameters
-     * @param context
-     * @param result
-     */
+
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
-        final PsiElement element = parameters.getPosition();
-        final Project project = element.getProject();
-        final PhpIndex phpIndex = PhpIndex.getInstance(project);
-        final MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(project);
         if (parameters.getOriginalPosition() == null) {
             return;
         }
-        PsiElement e = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
-        if (e instanceof MethodReference) {
-            MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) e);
+
+        PsiElement element = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
+        final Project project = element.getProject();
+        final PhpIndex phpIndex = PhpIndex.getInstance(project);
+        final MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(project);
+
+        if (element instanceof MethodReference) {
+            MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) element);
             if (root.getSignature().equals(settings.getSignatureMethodMagicDtoBuilderCreate())) {
                 //Is magic dto builder.
                 if (root.getParameters().length != 1 && !(root.getParameters()[0] instanceof ClassConstantReference)) {
