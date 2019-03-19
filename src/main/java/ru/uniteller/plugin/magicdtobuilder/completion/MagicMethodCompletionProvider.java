@@ -19,18 +19,19 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
-import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
+import ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Completion provider magic method.
@@ -44,32 +45,67 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
             return;
         }
 
-        PsiElement element = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
+        PsiElement arrowElement = parameters.getOriginalPosition().getPrevSibling();
+
+        PsiElement element = arrowElement.getPrevSibling();
         final Project project = element.getProject();
         final PhpIndex phpIndex = PhpIndex.getInstance(project);
 
         if (element instanceof MethodReference) {
             MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) element);
+            String FQN = null;
+
             if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
-                //Is magic dto builder.
                 ClassConstantReference classConstantReference = (ClassConstantReference) root.getParameters()[0];
                 if (classConstantReference.getClassReference() == null) {
                     return;
                 }
-                String FQN = classConstantReference.getClassReference().getDeclaredType().toString();
-                for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
+                FQN = classConstantReference.getClassReference().getDeclaredType().toString();
+            } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) element)) {
+                String[] types = ((MethodReference) element).getDeclaredType().toString().split(Pattern.quote("|"));
+                String type = types[types.length - 2];
+                FQN = type.substring(0, type.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
+            }
 
-                    if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) element)) {
-                        phpClass.getFields().forEach(field ->
-                                result.addElement(this.createSetterMethodLookupElementByField(field))
-                        );
-                        phpClass.getFields().forEach(field ->
-                                result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
-                        );
-                    }
+            if (FQN != null) {
+                for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
+                    phpClass.getFields().forEach(field ->
+                            result.addElement(this.createSetterMethodLookupElementByField(field))
+                    );
+                    phpClass.getFields().forEach(field ->
+                            result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
+                    );
+
                 }
             }
+
+        } else if (element instanceof Variable) {
+            for (PhpClass phpClass : getClassesByVariableMagicDtoBuilder((Variable) element)) {
+                phpClass.getFields().forEach(field ->
+                        result.addElement(this.createSetterMethodLookupElementByField(field))
+                );
+                phpClass.getFields().forEach(field ->
+                        result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
+                );
+
+            }
         }
+    }
+
+    private Collection<PhpClass> getClassesByVariableMagicDtoBuilder(Variable variable) {
+        String[] stringTypes = variable.getDeclaredType().toString().split(Pattern.quote("|"));
+        if (stringTypes.length != 3) {
+            return Collections.emptyList();
+        }
+        String signatureCreateMethod =
+                MagicDtoBuilderSettings.getInstance(variable.getProject())
+                        .getSignatureMethodMagicDtoBuilderCreate();
+        if (!stringTypes[2].equals("?") || !stringTypes[0].equals(signatureCreateMethod)) {
+            return Collections.emptyList();
+        }
+        String FQN = stringTypes[1].substring(0, stringTypes[1].length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
+
+        return PhpIndex.getInstance(variable.getProject()).getClassesByFQN(FQN);
     }
 
     /**

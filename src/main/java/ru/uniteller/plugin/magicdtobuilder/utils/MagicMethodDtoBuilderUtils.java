@@ -19,9 +19,6 @@ import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
  */
 public class MagicMethodDtoBuilderUtils {
 
-
-
-
     /**
      * Detect magic method dto builder
      *

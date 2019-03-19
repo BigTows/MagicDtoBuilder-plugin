@@ -35,9 +35,13 @@ public final class MethodReferenceUtils {
     public static MethodReference getFirstMethodReference(MethodReference methodReference) {
         PsiElement buffer = methodReference;
         while (buffer != null) {
-            if (buffer.getFirstChild() instanceof MethodReference) {
-                buffer = buffer.getFirstChild();
-            } else {
+            try {
+                if (buffer.getFirstChild() instanceof MethodReference) {
+                    buffer = buffer.getFirstChild();
+                } else {
+                    break;
+                }
+            } catch (Throwable e) {
                 break;
             }
         }
