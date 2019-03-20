@@ -83,8 +83,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             if (phpClassOptional.isPresent()) {
                 return PhpType.builder().add(phpClassOptional.get().getFQN()).build();
             }
-        } catch (IndexNotReadyException ignore) {
-        }
+        } catch (IndexNotReadyException ignore) {}
         return null;
     }
 
