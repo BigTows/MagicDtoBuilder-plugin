@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
+package io.github.bigtows.plugin.magicdtobuilder.utils;
+
+import com.intellij.psi.PsiElement;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import com.jetbrains.php.lang.psi.elements.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Collection methods for better experience for work with psi elements
+ */
+public final class MethodReferenceUtils {
+
+    /**
+     * Return root method reference
+     *
+     * @param methodReference method reference
+     * @return root method reference
+     * <p>
+     * if put AnyObject::add("data")->setData("data")->setA(1);
+     * return AnyObject::add("data")
+     * </p>
+     */
+    public static MethodReference getFirstMethodReference(MethodReference methodReference) {
+        PsiElement buffer = methodReference;
+        while (buffer != null) {
+            try {
+                if (buffer.getFirstChild() instanceof MethodReference) {
+                    buffer = buffer.getFirstChild();
+                } else {
+                    break;
+                }
+            } catch (Throwable e) {
+                break;
+            }
+        }
+        return (MethodReference) buffer;
+    }
+
+    /**
+     * Return declared type at root
+     *
+     * @param methodReference method reference
+     * @return declared type at root
+     */
+    public static PhpTypedElement getPhpTypedElementAtRootByMethodReference(@NotNull MethodReference methodReference) {
+        PhpTypedElement buffer = methodReference;
+
+        while (true) {
+            PsiElement firstPsiChild = buffer.getFirstPsiChild();
+            if (firstPsiChild instanceof MethodReference || firstPsiChild instanceof Variable) {
+                buffer = (PhpTypedElement) firstPsiChild;
+            } else {
+                break;
+            }
+        }
+        return buffer;
+    }
+
+
+    /**
+     * Return name field class by provider method reference
+     *
+     * @param providerMethodReference method class like: "set", "get", "has"
+     * @return name of field
+     */
+    @Nullable
+    public static String getNameFieldByProvidersMethod(MethodReference providerMethodReference) {
+        String nameField = providerMethodReference.getName();
+        if (null == nameField || nameField.length() < 4) {
+            return null;
+        }
+        StringBuilder nameFieldBuilder = new StringBuilder(nameField);
+        if (!MethodReferenceUtils.isPrefixProviderMethod(nameFieldBuilder.substring(0, 3))) {
+            return null;
+        }
+        nameFieldBuilder.delete(0, 3);
+        return Character.toLowerCase(nameFieldBuilder.charAt(0)) + nameFieldBuilder.substring(1);
+    }
+
+    /**
+     * Detect is prefix provider
+     *
+     * @param prefix prefix of method
+     * @return {@code true} if prefix same provider method else {@code false}
+     */
+    private static boolean isPrefixProviderMethod(String prefix) {
+        return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
+    }
+}

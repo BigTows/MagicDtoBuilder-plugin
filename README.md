@@ -1,4 +1,9 @@
-This plugin exists for work with magic DTO builder.
+
+### Master [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=master)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
+### Dev [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=refactore-code)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
+
+---
+
 
 For example we have, DTO:
 ```php
