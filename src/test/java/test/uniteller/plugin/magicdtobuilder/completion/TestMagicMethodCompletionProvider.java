@@ -12,34 +12,52 @@ package test.uniteller.plugin.magicdtobuilder.completion;
 
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 
+/**
+ * Unit tests for AutoComplete (CompletionProvider)
+ *
+ * @see com.intellij.codeInsight.completion.CompletionProvider
+ */
 public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
         myFixture.configureByFile("libs/ExampleDto.php");
     }
 
+    /**
+     * Test completion for magic method dto builder create.
+     */
     public void testCompletionForMagicMethodDtoBuilderCreate() {
         assertPhpCompletionContains("data/completion/completionForMagicCreateMethod.php",
                 "getUrl()", "setUrl()", "hasUrl()");
     }
 
-    public void testCompletionForVariable(){
+    /**
+     * Test completion for variable.
+     */
+    public void testCompletionForVariable() {
         assertPhpCompletionContains(
                 "data/completion/completionForVariable.php",
                 "getUrl()", "setUrl()", "hasUrl()"
         );
     }
 
-    public void testCompletionAfterSetterMethod(){
+    /**
+     * Test completion after setter method.
+     */
+    public void testCompletionAfterSetterMethod() {
         assertPhpCompletionContains(
                 "data/completion/completionAfterSetterMethod.php",
                 "getUrl()", "setUrl()", "hasUrl()"
         );
     }
 
-    public void testCompletionAfterGetterMethod(){
+    /**
+     * Test completion after getter method.
+     */
+    public void testCompletionAfterGetterMethod() {
         assertPhpCompletionContains(
                 "data/completion/completionAfterGetterMethod.php"
         );
