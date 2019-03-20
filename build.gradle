@@ -42,3 +42,4 @@ cobertura {
         coverageDirs << file("${it.name}/build/classes/main")
     }
 }
+cobertura.coverageFormats = ['html', 'xml']
