@@ -8,7 +8,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.annotator;
+package io.github.bigtows.plugin.magicdtobuilder.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;

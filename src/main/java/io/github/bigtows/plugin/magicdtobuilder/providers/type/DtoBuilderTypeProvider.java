@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
+package io.github.bigtows.plugin.magicdtobuilder.providers.type;
+
+import com.intellij.openapi.project.IndexNotReadyException;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
+import org.jetbrains.annotations.Nullable;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * Type provider for magic dto builder
+ */
+public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
+
+    @Override
+    public char getKey() {
+        return 'Đ';
+    }
+
+    @Nullable
+    @Override
+    public PhpType getType(PsiElement psiElement) {
+        if (psiElement instanceof MethodReference) {
+            return processMethodReference((MethodReference) psiElement);
+        }
+        return null;
+    }
+
+    /**
+     * Process method reference and get PhpType
+     *
+     * @param methodReference method reference
+     * @return if can't search PhpType return {@code null} else PhpType
+     */
+    @Nullable
+    private PhpType processMethodReference(MethodReference methodReference) {
+        PhpType phpType = null;
+        if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
+            phpType = this.getPhpTypeOfPhpClassByParameterMagicMethodDtoBuilder(methodReference);
+        } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
+            phpType = PhpType.builder().add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
+                    MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
+            )).build();
+        } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
+            phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
+        } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
+            phpType = PhpType.BOOLEAN;
+        }
+        return phpType;
+    }
+
+    /**
+     * Get php type of php class by parameter of magic method dto builder
+     *
+     * @param methodReference method reference
+     * @return PhpType or  if can't found return {@code null}
+     */
+    @Nullable
+    private PhpType getPhpTypeOfPhpClassByParameterMagicMethodDtoBuilder(MethodReference methodReference) {
+        PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
+        String FQN = ((ClassReference) methodReference.getParameters()[0].getFirstChild()).getDeclaredType().toString();
+        try {
+            Optional<PhpClass> phpClassOptional = phpIndex.getClassesByFQN(FQN).stream().findFirst();
+            if (phpClassOptional.isPresent()) {
+                return PhpType.builder().add(phpClassOptional.get().getFQN()).build();
+            }
+        } catch (IndexNotReadyException ignore) {
+        }
+        return null;
+    }
+
+    /**
+     * Get PhpType of magic getter method dto builder
+     *
+     * @param methodReference method reference
+     * @return PHPType or if can't find field {@code null}
+     */
+    @Nullable
+    private PhpType getPhpTypeOfMagicGetterMethodDtoBuilder(MethodReference methodReference) {
+        try {
+            PsiElement resolveElement = methodReference.resolve();
+            if (resolveElement instanceof Field) {
+                return PhpType.builder().add(((Field) resolveElement).getDeclaredType()).build();
+            }
+        } catch (IndexNotReadyException ignore) {
+        }
+        return null;
+    }
+
+    @Override
+    public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+        return null;
+    }
+}

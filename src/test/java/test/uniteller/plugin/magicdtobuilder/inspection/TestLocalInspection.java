@@ -10,7 +10,7 @@
 
 package test.uniteller.plugin.magicdtobuilder.inspection;
 
-import ru.uniteller.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
+import io.github.bigtows.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
 import test.uniteller.plugin.magicdtobuilder.AssertPhpLocalInspectionData;
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 

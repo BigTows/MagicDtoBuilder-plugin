@@ -1,8 +1,8 @@
-package ru.uniteller.plugin.magicdtobuilder.utils;
+package io.github.bigtows.plugin.magicdtobuilder.utils;
 
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 
 import java.util.ArrayList;
 import java.util.List;

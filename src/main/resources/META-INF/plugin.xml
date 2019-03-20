@@ -9,13 +9,13 @@
   -->
 
 <idea-plugin>
-    <id>ru.uniteller.plugin.magicdtobuilder.MagicDtoBuilder</id>
+    <id>io.github.bigtows.plugin.magicdtobuilder.MagicDtoBuilder</id>
     <name>MagicDtoBuilder</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor url="https://github.com/BigTows/MagicDtoBuilder-plugin">MagicDtoBuilder GitHub OpenSource</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+        This allows you to simplify the routine work of writing DTO.
+        Now you can simply describe the structure of the DTO, and this plugin has to take care of how to create and provide access to the fields of the class.
     ]]></description>
 
     <depends>com.jetbrains.php</depends>
@@ -25,25 +25,25 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="PHP"
-                                implementationClass="ru.uniteller.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
+                                implementationClass="io.github.bigtows.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
 
         <annotator language="PHP"
-                   implementationClass="ru.uniteller.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator"
+                   implementationClass="io.github.bigtows.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator"
                    order="last"/>
-        <projectService serviceImplementation="ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
+        <projectService serviceImplementation="io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
 
         <localInspection groupPath="MagicDtoBuilder" shortName="NotFoundDtoType"
                          displayName="Not found Dto Type in PHPDoc"
                          groupName="NotFoundDtoTypeInPhpDocParamTag"
                          enabledByDefault="true" level="WARNING"
                          language="PHP"
-                         implementationClass="ru.uniteller.plugin.magicdtobuilder.inspection.local.NotFoundDtoTypeInPhpDocParamTagLocalInspector"/>
+                         implementationClass="io.github.bigtows.plugin.magicdtobuilder.inspection.local.NotFoundDtoTypeInPhpDocParamTagLocalInspector"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
-        <typeProvider3 implementation="ru.uniteller.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider"/>
+        <typeProvider3 implementation="io.github.bigtows.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider"/>
         <referenceResolver
-                implementation="ru.uniteller.plugin.magicdtobuilder.resolver.reference.MagicMethodDtoBuilderReferenceResolver"/>
+                implementation="io.github.bigtows.plugin.magicdtobuilder.resolver.reference.MagicMethodDtoBuilderReferenceResolver"/>
     </extensions>
 
     <actions>

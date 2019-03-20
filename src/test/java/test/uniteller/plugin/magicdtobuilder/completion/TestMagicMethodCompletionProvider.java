@@ -24,6 +24,8 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
         myFixture.configureByFile("libs/ExampleDto.php");
+        myFixture.configureByFile("libs/ExampleDtoWithTrait.php");
+        myFixture.configureByFile("libs/TraitDto.php");
     }
 
     /**
@@ -63,13 +65,43 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
         );
     }
 
+
     /**
-     * Test completion after getter method.
+     * Test completion after setter method and variable.
      */
     public void testCompletionAfterSetterMethodAndVariable() {
         assertPhpCompletionContains(
                 "data/completion/completionAfterSetterMethodAndVariable.php",
                 "getUrl()", "setUrl()", "hasUrl()"
+        );
+    }
+
+    /**
+     * Test completion for variable with php doc.
+     */
+    public void testCompletionForVariableWithPhpDoc() {
+        assertPhpCompletionContains(
+                "data/completion/completionForVariableWithPhpDoc.php",
+                "getUrl()", "setUrl()", "hasUrl()"
+        );
+    }
+
+    /**
+     * Test completion for variable with invalid php doc.
+     */
+    public void testCompletionForVariableWithInvalidPhpDoc() {
+        assertPhpCompletionContains(
+                "data/completion/completionForVariableWithInvalidPhpDoc.php"
+        );
+    }
+
+    /**
+     * Test completion for dto with trait.
+     */
+    public void testCompletionForDtoWithTrait() {
+        assertPhpCompletionContains(
+                "data/completion/completionForDtoWithTrait.php",
+                "getDataTrait()", "getUrl()", "hasDataTrait()", "hasUrl()", "setDataTrait()", "setUrl()"
         );
     }
 

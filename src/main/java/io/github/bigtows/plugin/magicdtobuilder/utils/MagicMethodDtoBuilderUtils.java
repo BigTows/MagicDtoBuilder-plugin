@@ -8,11 +8,11 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.utils;
+package io.github.bigtows.plugin.magicdtobuilder.utils;
 
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 
 /**
  * Utils method's for best development

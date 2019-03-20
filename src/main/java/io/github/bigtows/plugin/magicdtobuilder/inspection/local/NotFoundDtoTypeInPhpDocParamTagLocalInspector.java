@@ -1,4 +1,4 @@
-package ru.uniteller.plugin.magicdtobuilder.inspection.local;
+package io.github.bigtows.plugin.magicdtobuilder.inspection.local;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -9,10 +9,10 @@ import com.jetbrains.php.lang.psi.elements.Function;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import io.github.bigtows.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import io.github.bigtows.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 import org.jetbrains.annotations.NotNull;
-import ru.uniteller.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
-import ru.uniteller.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 
 public class NotFoundDtoTypeInPhpDocParamTagLocalInspector extends LocalInspectionTool {
     @NotNull

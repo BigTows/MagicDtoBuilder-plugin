@@ -8,17 +8,17 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.utils;
+package io.github.bigtows.plugin.magicdtobuilder.utils;
 
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.elements.Variable;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Collection methods for better experience for work with method reference
+ * Collection methods for better experience for work with psi elements
  */
 public final class MethodReferenceUtils {
 
@@ -54,7 +54,7 @@ public final class MethodReferenceUtils {
      * @param methodReference method reference
      * @return declared type at root
      */
-    public static PhpType getDeclaredTypeAtRootByMethodReference(@NotNull MethodReference methodReference) {
+    public static PhpTypedElement getPhpTypedElementAtRootByMethodReference(@NotNull MethodReference methodReference) {
         PhpTypedElement buffer = methodReference;
 
         while (true) {
@@ -65,6 +65,37 @@ public final class MethodReferenceUtils {
                 break;
             }
         }
-        return buffer.getDeclaredType();
+        return buffer;
+    }
+
+
+    /**
+     * Return name field class by provider method reference
+     *
+     * @param providerMethodReference method class like: "set", "get", "has"
+     * @return name of field
+     */
+    @Nullable
+    public static String getNameFieldByProvidersMethod(MethodReference providerMethodReference) {
+        String nameField = providerMethodReference.getName();
+        if (null == nameField || nameField.length() < 4) {
+            return null;
+        }
+        StringBuilder nameFieldBuilder = new StringBuilder(nameField);
+        if (!MethodReferenceUtils.isPrefixProviderMethod(nameFieldBuilder.substring(0, 3))) {
+            return null;
+        }
+        nameFieldBuilder.delete(0, 3);
+        return Character.toLowerCase(nameFieldBuilder.charAt(0)) + nameFieldBuilder.substring(1);
+    }
+
+    /**
+     * Detect is prefix provider
+     *
+     * @param prefix prefix of method
+     * @return {@code true} if prefix same provider method else {@code false}
+     */
+    private static boolean isPrefixProviderMethod(String prefix) {
+        return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
     }
 }

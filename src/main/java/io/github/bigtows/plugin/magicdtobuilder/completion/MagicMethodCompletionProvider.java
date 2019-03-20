@@ -8,7 +8,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.completion;
+package io.github.bigtows.plugin.magicdtobuilder.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
@@ -19,13 +19,16 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
-import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
-import ru.uniteller.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
-import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,28 +43,44 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
             return;
         }
         PsiElement psiElement = parameters.getPosition().getPrevSibling();
-        PhpClass phpClass = getDtoClassByPsiElement(psiElement.getPrevSibling());
+        if (psiElement.getPrevSibling() instanceof PhpTypedElement) {
+            this.addCompletionsOfPhpTypedElement((PhpTypedElement) psiElement.getPrevSibling(), result);
+        }
+    }
+
+    /**
+     * Process Php typed element
+     *
+     * @param phpTypedElement php typed element
+     * @param resultSet       completion set
+     */
+    private void addCompletionsOfPhpTypedElement(PhpTypedElement phpTypedElement, CompletionResultSet resultSet) {
+        PhpClass phpClass = getDtoClassByPhpTypedElement(phpTypedElement);
         if (phpClass != null) {
-            phpClass.getFields().forEach(field -> result.addAllElements(this.createMethodLookupElementByField(field)));
+            String fqnOfDto = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpTypedElement);
+            String signatureMagicDtoBuilder = MagicDtoBuilderSettings.getInstance(phpClass.getProject()).getSignatureMagicDtoBuilder();
+            phpClass.getFields().forEach(field -> resultSet.addAllElements(
+                    this.createMethodLookupElementByField(field, signatureMagicDtoBuilder + "|" + fqnOfDto)
+            ));
         }
     }
 
     /**
      * Get PHPClass DTO by psi element (MethodReference, Variable)
      *
-     * @param element psi element
+     * @param phpTypedElement php typed element
      * @return if success PHPClass else {@code null}
      */
     @Nullable
-    private PhpClass getDtoClassByPsiElement(@Nullable PsiElement element) {
+    private PhpClass getDtoClassByPhpTypedElement(@NotNull PhpTypedElement phpTypedElement) {
         String FQN = null;
-        if (element instanceof MethodReference) {
-            FQN = this.getFQNByMethodReference((MethodReference) element);
-        } else if (element instanceof Variable) {
-            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement((PhpTypedElement) element);
+        if (phpTypedElement instanceof MethodReference) {
+            FQN = this.getFQNByMethodReference((MethodReference) phpTypedElement);
+        } else if (phpTypedElement instanceof Variable) {
+            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpTypedElement);
         }
         if (FQN != null) {
-            final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
+            final PhpIndex phpIndex = PhpIndex.getInstance(phpTypedElement.getProject());
             //Return only 1 phpclass, mb need return many...
             return phpIndex.getClassesByFQN(FQN).stream().findFirst().orElse(null);
         }
@@ -80,7 +99,7 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
             MethodReference root = MethodReferenceUtils.getFirstMethodReference(methodReference);
             if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
                 return this.getFQNByMethodReference(root);
-            }else{
+            } else {
                 return PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(methodReference);
             }
         } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
@@ -96,27 +115,32 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
     /**
      * Create lookup elements by field
      *
-     * @param field field on the basis of which creating lookup elements
+     * @param field            field on the basis of which creating lookup elements
+     * @param returnTypeSetter return type for setter
      * @return lookup elements
      */
-    private List<LookupElement> createMethodLookupElementByField(@NotNull Field field) {
+    private List<LookupElement> createMethodLookupElementByField(@NotNull Field field, String returnTypeSetter) {
         List<LookupElement> lookupElements = new ArrayList<>();
         String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
+        Icon publicMethodIcon = MagicDtoBuilderSettings.getPublicMethodIcon();
         lookupElements.add(
                 LookupElementBuilder.create("set" + preparedNameField + "()")
                         .withPresentableText("set" + preparedNameField + "($" + field.getName() + ")")
-                        .withIcon(field.getIcon())
+                        .withTypeText(returnTypeSetter)
+                        .withIcon(publicMethodIcon)
         );
         lookupElements.add(
                 LookupElementBuilder.create("get" + preparedNameField + "()")
                         .withPresentableText("get" + preparedNameField + "()")
-                        .withIcon(field.getIcon())
+                        .withTypeText(field.getDeclaredType().toString())
+                        .withIcon(publicMethodIcon)
         );
 
         lookupElements.add(
                 LookupElementBuilder.create("has" + preparedNameField + "()")
                         .withPresentableText("has" + preparedNameField + "()")
-                        .withIcon(field.getIcon())
+                        .withTypeText(PhpType.BOOLEAN.toString())
+                        .withIcon(publicMethodIcon)
         );
         return lookupElements;
     }

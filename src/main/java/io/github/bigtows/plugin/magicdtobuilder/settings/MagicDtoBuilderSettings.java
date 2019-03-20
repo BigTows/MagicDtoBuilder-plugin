@@ -8,17 +8,20 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.settings;
+package io.github.bigtows.plugin.magicdtobuilder.settings;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.RowIcon;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.regex.Pattern;
 
 @State(
@@ -28,6 +31,8 @@ import java.util.regex.Pattern;
         }
 )
 public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDtoBuilderSettings> {
+
+    private static RowIcon PUBLIC_METHOD_ICON;
 
     /**
      * TODO set default: "".
@@ -64,7 +69,23 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
         return signatureMethodMagicDtoBuilderCreate;
     }
 
-    public String getSignatureMagicDtoBuilder(){
-       return signatureMethodMagicDtoBuilderCreate.replace("#M#C","").split(Pattern.quote("."))[0];
+    public String getSignatureMagicDtoBuilder() {
+        return signatureMethodMagicDtoBuilderCreate.replace("#M#C", "").split(Pattern.quote("."))[0];
+    }
+
+    /**
+     * Get icon for public method icon
+     * <p>
+     *     Support lazy load.
+     * </p>
+     * @return Icon
+     */
+    public static Icon getPublicMethodIcon() {
+        if (PUBLIC_METHOD_ICON == null) {
+            PUBLIC_METHOD_ICON = new RowIcon(2);
+            PUBLIC_METHOD_ICON.setIcon(AllIcons.Nodes.Method, 0);
+            PUBLIC_METHOD_ICON.setIcon(AllIcons.Nodes.C_public, 1);
+        }
+        return PUBLIC_METHOD_ICON;
     }
 }

@@ -5,7 +5,7 @@ plugins {
 
 
 group 'ru.uniteller.plugin'
-version '0.0.1a'
+version '0.5-beta'
 
 sourceCompatibility = 1.8
 

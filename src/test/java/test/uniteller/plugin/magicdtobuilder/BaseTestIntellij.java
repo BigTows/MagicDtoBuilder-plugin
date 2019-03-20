@@ -54,10 +54,9 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
      * Completion assert between myFixture and Excepted data
      *
      * @param exceptedLookupElementStrings excepted data
-     * @param lookupElementStrings         myFixture lookup elements
+     * @param lookupElements         myFixture lookup elements
      */
-    private void completionContainsAssert(String[] exceptedLookupElementStrings, List<String> lookupElementStrings) {
-        List<String> lookupElements = myFixture.getLookupElementStrings();
+    private void completionContainsAssert(String[] exceptedLookupElementStrings, List<String> lookupElements) {
         if (lookupElements == null) {
             fail("Error completionContainsAssert. (myFixture.getLookupElementStrings return NULL)");
         }

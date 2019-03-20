@@ -8,7 +8,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.annotator;
+package io.github.bigtows.plugin.magicdtobuilder.annotator;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -16,7 +16,7 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
