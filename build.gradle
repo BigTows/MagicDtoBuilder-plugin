@@ -15,12 +15,16 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.4'
 }
 
 intellij {
     version ideaVersion
     plugins = [
             "com.jetbrains.php:${phpPluginVersion}",
+            "CSS",
+            "java-i18n",
+            "properties"
            // "org.jetbrains.plugins.localization:${localizationPluginVersion}"
     ]
     updateSinceUntilBuild false

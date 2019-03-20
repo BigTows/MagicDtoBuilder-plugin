@@ -62,6 +62,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
                         this.findMagicDtoBuilderByDeclarationType(MethodReferenceUtils.getDeclaredTypeAtRootByMethodReference(methodReference))
                 ).build();
             } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
+                //TODO exception.. To reindex this file IDEA has to be restarted
                 PsiElement resolveElement = methodReference.resolve();
                 if (resolveElement instanceof Field) {
                     phpType = PhpType.builder().add(((Field) resolveElement).getDeclaredType()).build();

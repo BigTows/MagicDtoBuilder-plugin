@@ -21,9 +21,8 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
-import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
+import ru.uniteller.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -35,53 +34,14 @@ import java.util.regex.Pattern;
  */
 public class MagicMethodCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
-        if (parameters.getOriginalPosition() == null) {
+        if (parameters.getPosition().getPrevSibling() == null) {
             return;
         }
-/*
-        PsiElement arrowElement = parameters.getOriginalPosition().getPrevSibling();
+        PsiElement psiElement = parameters.getPosition().getPrevSibling();
 
-        PsiElement element = arrowElement.getPrevSibling();
-        final Project project = element.getProject();
-        final PhpIndex phpIndex = PhpIndex.getInstance(project);
-
-        if (element instanceof MethodReference) {
-            MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) element);
-            String FQN = null;
-
-            if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
-                ClassConstantReference classConstantReference = (ClassConstantReference) root.getParameters()[0];
-                if (classConstantReference.getClassReference() == null) {
-                    return;
-                }
-                FQN = classConstantReference.getClassReference().getDeclaredType().toString();
-            } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) element)) {
-                String[] types = ((MethodReference) element).getDeclaredType().toString().split(Pattern.quote("|"));
-                String type = types[types.length - 2];
-                FQN = type.substring(0, type.length() - DtoBuilderTypeProvider.POSTFIX_BUILDER_DTO.length());
-            }
-
-            if (FQN != null) {
-                for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
-                    phpClass.getFields().forEach(field ->
-                            result.addElement(this.createSetterMethodLookupElementByField(field))
-                    );
-                    phpClass.getFields().forEach(field ->
-                            result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
-                    );
-
-                }
-            }
-
-        } else if (element instanceof Variable) {
-
-        }
-*/
-
-        PhpClass phpClass = getDtoClassByPsiElement(parameters.getOriginalPosition());
+        PhpClass phpClass = getDtoClassByPsiElement(psiElement.getPrevSibling());
 
         if (phpClass == null) {
             return;
@@ -97,26 +57,24 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
     }
 
     @Nullable
-    private PhpClass getDtoClassByPsiElement(PsiElement element) {
-        PsiElement arrowElement = element.getPrevSibling();
-        PsiElement prevNamedElement = arrowElement.getPrevSibling();
+    private PhpClass getDtoClassByPsiElement(@Nullable PsiElement element) {
         String FQN = null;
-        if (prevNamedElement instanceof MethodReference) {
-            if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder((MethodReference) prevNamedElement)) {
-                String[] types = ((MethodReference) prevNamedElement).getDeclaredType().toString().split(Pattern.quote("|"));
+        if (element instanceof MethodReference) {
+            MethodReference methodReference = (MethodReference) element;
+            if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
+                String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
+                //Check Array out bound..
                 FQN = types[types.length - 2];
-            } else {
-                MethodReference root = MethodReferenceUtils.getFirstMethodReference((MethodReference) prevNamedElement);
-                if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
-                    ClassConstantReference classConstantReference = (ClassConstantReference) root.getParameters()[0];
-                    if (classConstantReference.getClassReference() == null) {
-                        return null;
-                    }
-                    FQN = classConstantReference.getClassReference().getDeclaredType().toString();
+            } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
+                ClassConstantReference classConstantReference = (ClassConstantReference) (methodReference).getParameters()[0];
+                if (classConstantReference.getClassReference() == null) {
+                    return null;
                 }
+                FQN = classConstantReference.getClassReference().getDeclaredType().toString();
+
             }
-        } else if (prevNamedElement instanceof Variable) {
-            FQN = this.getClassesFQNByVariableMagicDtoBuilder((Variable) prevNamedElement);
+        } else if (element instanceof Variable) {
+            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoName((PhpTypedElement) element);
         }
         if (FQN != null) {
             final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
@@ -127,23 +85,6 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
         }
         return null;
 
-    }
-
-
-    @Nullable
-    private String getClassesFQNByVariableMagicDtoBuilder(Variable variable) {
-        String[] stringTypes = variable.getDeclaredType().toString().split(Pattern.quote("|"));
-        MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(variable.getProject());
-        if (stringTypes[stringTypes.length - 1].equals("?")) {
-            //is locale variable
-            if (stringTypes.length == 3 && stringTypes[0].equals(settings.getSignatureMethodMagicDtoBuilderCreate())) {
-                return stringTypes[1];
-            }
-        } else if (stringTypes.length == 2 && stringTypes[0].equals(settings.getSignatureMagicDtoBuilder())) {
-            //is parameter variable
-            return stringTypes[1];
-        }
-        return null;
     }
 
     /**
