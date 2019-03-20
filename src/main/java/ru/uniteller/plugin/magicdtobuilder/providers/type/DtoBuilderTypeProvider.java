@@ -43,7 +43,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
 
     @Override
     public char getKey() {
-        return 'D';
+        return 'Đ';
     }
 
     @Nullable

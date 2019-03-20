@@ -28,7 +28,6 @@ import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Completion provider magic method.
@@ -57,9 +56,9 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
     private PhpClass getDtoClassByPsiElement(@Nullable PsiElement element) {
         String FQN = null;
         if (element instanceof MethodReference) {
-            FQN = this.getFANByMethodReference((MethodReference) element);
+            FQN = this.getFQNByMethodReference((MethodReference) element);
         } else if (element instanceof Variable) {
-            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoName((PhpTypedElement) element);
+            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement((PhpTypedElement) element);
         }
         if (FQN != null) {
             final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
@@ -76,16 +75,13 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
      * @return if success FQN class DTO else {@code null}
      */
     @Nullable
-    private String getFANByMethodReference(MethodReference methodReference) {
+    private String getFQNByMethodReference(MethodReference methodReference) {
         if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
             MethodReference root = MethodReferenceUtils.getFirstMethodReference(methodReference);
             if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
-                return this.getFANByMethodReference(root);
+                return this.getFQNByMethodReference(root);
             }else{
-                //TODO change algorithm.
-                String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
-                //Check Array out bound..
-                return types[types.length - 2];
+                return PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(methodReference);
             }
         } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
             ClassConstantReference classConstantReference = (ClassConstantReference) (methodReference).getParameters()[0];

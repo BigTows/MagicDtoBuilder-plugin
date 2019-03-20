@@ -16,11 +16,11 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.PhpReferenceResolver;
 import org.jetbrains.annotations.Nullable;
 import ru.uniteller.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
+import ru.uniteller.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Reference magic method for DtoBuilder
@@ -48,18 +48,11 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
         if (null == methodName) {
             return phpNamedElements;
         }
-        String[] declaredTypes = new String[0];
         PsiElement firstChildElement = methodReference.getFirstChild();
-        if (firstChildElement instanceof MethodReference || firstChildElement instanceof Variable) {
-            declaredTypes = ((PhpReference) firstChildElement).getDeclaredType().toString().split(Pattern.quote("|"));
+        if (!(firstChildElement instanceof PhpTypedElement)) {
+            return phpNamedElements;
         }
-        String FQN;
-        if (declaredTypes[declaredTypes.length - 1].equals("?")) {
-            //is local variable
-            FQN = declaredTypes[declaredTypes.length - 2];
-        } else {
-            FQN = declaredTypes[declaredTypes.length - 1];
-        }
+        String FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement((PhpTypedElement) firstChildElement);
         PhpIndex phpIndex = PhpIndex.getInstance(methodReference.getProject());
         Collection<PhpClass> phpClasses = phpIndex.getClassesByFQN(FQN);
 
