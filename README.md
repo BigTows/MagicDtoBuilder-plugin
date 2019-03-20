@@ -1,6 +1,10 @@
-Travis status:
-## Master [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=master)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
-## Dev [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=dev)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
+# Project status 
+
+| Branch | Travis   |   |   |
+|--------|---|---|---|
+| master |[![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=master)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)   |   |   |
+| dev    |[![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=dev)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)   |   |   |
+
 
 ---
 
