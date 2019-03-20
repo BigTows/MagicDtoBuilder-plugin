@@ -40,51 +40,54 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
             return;
         }
         PsiElement psiElement = parameters.getPosition().getPrevSibling();
-
         PhpClass phpClass = getDtoClassByPsiElement(psiElement.getPrevSibling());
-
-        if (phpClass == null) {
-            return;
+        if (phpClass != null) {
+            phpClass.getFields().forEach(field -> result.addAllElements(this.createMethodLookupElementByField(field)));
         }
-        phpClass.getFields().forEach(field ->
-                result.addElement(this.createSetterMethodLookupElementByField(field))
-        );
-        phpClass.getFields().forEach(field ->
-                result.addAllElements(this.createDataProviderMethodLookupElementByField(field))
-        );
-
-
     }
 
+    /**
+     * Get PHPClass DTO by psi element (MethodReference, Variable)
+     *
+     * @param element psi element
+     * @return if success PHPClass else {@code null}
+     */
     @Nullable
     private PhpClass getDtoClassByPsiElement(@Nullable PsiElement element) {
         String FQN = null;
         if (element instanceof MethodReference) {
-            MethodReference methodReference = (MethodReference) element;
-            if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
-                String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
-                //Check Array out bound..
-                FQN = types[types.length - 2];
-            } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
-                ClassConstantReference classConstantReference = (ClassConstantReference) (methodReference).getParameters()[0];
-                if (classConstantReference.getClassReference() == null) {
-                    return null;
-                }
-                FQN = classConstantReference.getClassReference().getDeclaredType().toString();
-
-            }
+            FQN = this.getFANByMethodReference((MethodReference) element);
         } else if (element instanceof Variable) {
             FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoName((PhpTypedElement) element);
         }
         if (FQN != null) {
             final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
-            for (PhpClass phpClass : phpIndex.getClassesByFQN(FQN)) {
-                //Need check size collection (>1)?
-                return phpClass;
-            }
+            //Return only 1 phpclass, mb need return many...
+            return phpIndex.getClassesByFQN(FQN).stream().findFirst().orElse(null);
         }
         return null;
+    }
 
+    /**
+     * Get FQN class DTO by method reference
+     *
+     * @param methodReference method reference
+     * @return if success FQN class DTO else {@code null}
+     */
+    @Nullable
+    private String getFANByMethodReference(MethodReference methodReference) {
+        if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
+            String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
+            //Check Array out bound..
+            return types[types.length - 2];
+        } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
+            ClassConstantReference classConstantReference = (ClassConstantReference) (methodReference).getParameters()[0];
+            if (classConstantReference.getClassReference() == null) {
+                return null;
+            }
+            return classConstantReference.getClassReference().getDeclaredType().toString();
+        }
+        return null;
     }
 
     /**
@@ -93,17 +96,14 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
      * @param field field on the basis of which creating lookup elements
      * @return lookup elements
      */
-    private LookupElement createSetterMethodLookupElementByField(@NotNull Field field) {
-        String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
-
-        return LookupElementBuilder.create("set" + preparedNameField + "()")
-                .withPresentableText("set" + preparedNameField + "($" + field.getName() + ")")
-                .withIcon(field.getIcon());
-    }
-
-    private List<LookupElement> createDataProviderMethodLookupElementByField(@NotNull Field field) {
+    private List<LookupElement> createMethodLookupElementByField(@NotNull Field field) {
         List<LookupElement> lookupElements = new ArrayList<>();
         String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
+        lookupElements.add(
+                LookupElementBuilder.create("set" + preparedNameField + "()")
+                        .withPresentableText("set" + preparedNameField + "($" + field.getName() + ")")
+                        .withIcon(field.getIcon())
+        );
         lookupElements.add(
                 LookupElementBuilder.create("get" + preparedNameField + "()")
                         .withPresentableText("get" + preparedNameField + "()")

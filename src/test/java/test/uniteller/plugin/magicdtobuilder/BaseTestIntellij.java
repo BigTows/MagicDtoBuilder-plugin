@@ -14,7 +14,7 @@ import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 
 import java.util.List;
 
-public class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
+public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
 
 
     @Override
@@ -61,12 +61,5 @@ public class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
                 );
             }
         }
-    }
-
-    /**
-     * Empty test for remove exception about: "No tests found in ..."
-     */
-    public void test() {
-
     }
 }

@@ -12,7 +12,7 @@ package test.uniteller.plugin.magicdtobuilder.completion;
 
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 
-public class TestMagicMethodCompletionProvider extends BaseTestIntellij {
+public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
 
     public void setUp() throws Exception {
         super.setUp();
