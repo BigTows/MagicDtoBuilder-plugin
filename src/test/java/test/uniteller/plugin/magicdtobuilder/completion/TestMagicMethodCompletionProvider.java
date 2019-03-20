@@ -63,4 +63,14 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
         );
     }
 
+    /**
+     * Test completion after getter method.
+     */
+    public void testCompletionAfterSetterMethodAndVariable() {
+        assertPhpCompletionContains(
+                "data/completion/completionAfterSetterMethodAndVariable.php",
+                "getUrl()", "setUrl()", "hasUrl()"
+        );
+    }
+
 }

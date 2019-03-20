@@ -22,6 +22,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.uniteller.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import ru.uniteller.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 import ru.uniteller.plugin.magicdtobuilder.utils.StringUtils;
 
@@ -77,9 +78,15 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
     @Nullable
     private String getFANByMethodReference(MethodReference methodReference) {
         if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
-            String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
-            //Check Array out bound..
-            return types[types.length - 2];
+            MethodReference root = MethodReferenceUtils.getFirstMethodReference(methodReference);
+            if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(root)) {
+                return this.getFANByMethodReference(root);
+            }else{
+                //TODO change algorithm.
+                String[] types = methodReference.getDeclaredType().toString().split(Pattern.quote("|"));
+                //Check Array out bound..
+                return types[types.length - 2];
+            }
         } else if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
             ClassConstantReference classConstantReference = (ClassConstantReference) (methodReference).getParameters()[0];
             if (classConstantReference.getClassReference() == null) {
