@@ -8,7 +8,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.uniteller.plugin.magicdtobuilder.inspection.local.fix;
+package io.github.bigtows.plugin.magicdtobuilder.inspection.local.fix;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
