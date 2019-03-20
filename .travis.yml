@@ -5,6 +5,6 @@ jdk:
 script:
   - ./gradlew build
 after_success:
-  - ./gradlew jacocoTestReport coveralls
+  - ./gradlew cobertura coveralls
 env:
   - COVERALLS_REPO_TOKEN=aaa1
