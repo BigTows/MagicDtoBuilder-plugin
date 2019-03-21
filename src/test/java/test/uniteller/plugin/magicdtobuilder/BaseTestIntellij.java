@@ -54,7 +54,7 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
      * Completion assert between myFixture and Excepted data
      *
      * @param exceptedLookupElementStrings excepted data
-     * @param lookupElements         myFixture lookup elements
+     * @param lookupElements               myFixture lookup elements
      */
     private void completionContainsAssert(String[] exceptedLookupElementStrings, List<String> lookupElements) {
         if (lookupElements == null) {
@@ -77,6 +77,7 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
             }
         }
     }
+
 
     /**
      * Assert php local inspection
@@ -120,11 +121,6 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
     private List<ProblemDescriptor> getPhpProblemsDescriptor(String filePath) {
 
         PsiElement psiFile = myFixture.configureByFile(filePath);
-
-        int caretOffset = myFixture.getCaretOffset();
-        if (caretOffset <= 0) {
-            fail("<caret> tag not initialized");
-        }
         ProblemsHolder problemsHolder = new ProblemsHolder(InspectionManager.getInstance(getProject()), psiFile.getContainingFile(), false);
 
         for (LocalInspectionEP localInspectionEP : LocalInspectionEP.LOCAL_INSPECTION.getExtensions()) {
@@ -139,7 +135,7 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
                 psiFile.acceptChildren(new PhpElementVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
-                        PsiElement psiElementAtCaret = psiFile.findElementAt(caretOffset);
+                        PsiElement psiElementAtCaret = getPsiElementAtCaret();
                         if (psiElementAtCaret == null) {
                             return;
                         }
@@ -155,6 +151,21 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
 
         return problemsHolder.getResults();
     }
+
+    /**
+     * Get psi element at caret
+     *
+     * @return psi element at caret
+     */
+    protected PsiElement getPsiElementAtCaret() {
+        PsiElement psiFile = myFixture.getFile();
+        int caretOffset = myFixture.getCaretOffset();
+        if (caretOffset <= 0) {
+            fail("Can't find <caret>, you may have forgotten to load the file?");
+        }
+        return psiFile.findElementAt(caretOffset);
+    }
+
 
     /**
      * Warm up php index.

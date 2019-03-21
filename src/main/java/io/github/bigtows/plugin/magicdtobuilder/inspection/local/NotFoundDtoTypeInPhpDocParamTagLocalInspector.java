@@ -49,7 +49,7 @@ public class NotFoundDtoTypeInPhpDocParamTagLocalInspector extends LocalInspecti
         if (function.getDocComment() == null) {
             return;
         }
-        String typeDto = PhpTypedElementMagicDtoBuilderUtils.getDtoName(element);
+        String typeDto = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(element);
         String signatureMagicDtoBuilder = MagicDtoBuilderSettings.getInstance(element.getProject()).getSignatureMagicDtoBuilder();
         for (PhpDocParamTag docParamTag : function.getDocComment().getParamTags()) {
             if (typeDto != null
