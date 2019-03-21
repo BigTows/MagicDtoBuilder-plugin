@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.3.12'
+    id 'org.jetbrains.intellij' version '0.4.4'
     id 'jacoco'
     id 'com.github.kt3k.coveralls' version '2.8.2'
 }
