@@ -7,5 +7,4 @@ script:
 after_success:
   - ./gradlew jacocoTestReport coveralls
 env:
-  - COVERALLS_REPO_TOKEN=aaa1
-  - CI_NAME=travis-ci
+  - COVERALLS_REPO_TOKEN=aaa1 CI_NAME=travis-ci
