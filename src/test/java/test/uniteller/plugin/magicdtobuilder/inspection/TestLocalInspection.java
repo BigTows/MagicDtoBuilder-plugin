@@ -11,7 +11,7 @@
 package test.uniteller.plugin.magicdtobuilder.inspection;
 
 import io.github.bigtows.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
-import test.uniteller.plugin.magicdtobuilder.AssertPhpLocalInspectionData;
+import test.uniteller.plugin.magicdtobuilder.bundle.AssertPhpLocalInspectionBundle;
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 
 /**
@@ -35,7 +35,7 @@ public class TestLocalInspection extends BaseTestIntellij {
     public void testUpdatePhpDocParamTag() {
         assertPhpLocalInspectionContains(
                 "data/inspection/UpdatePhpDocParamTag.php",
-                AssertPhpLocalInspectionData.build("Append type dto", 93)
+                AssertPhpLocalInspectionBundle.build("Append type dto", 93)
                         .addQuickFixClasses(AppendDtoClassIntoPhpDocParamTagQuickFix.class)
         );
     }
@@ -46,7 +46,7 @@ public class TestLocalInspection extends BaseTestIntellij {
     public void testUpdatePhpDocParamTagIfFunctionReferenceStorageInFunction() {
         assertPhpLocalInspectionContains(
                 "data/inspection/UpdatePhpDocParamTagIfFunctionReferenceStorageInFunction.php",
-                AssertPhpLocalInspectionData.build("Append type dto", 144)
+                AssertPhpLocalInspectionBundle.build("Append type dto", 144)
                         .addQuickFixClasses(AppendDtoClassIntoPhpDocParamTagQuickFix.class)
         );
     }

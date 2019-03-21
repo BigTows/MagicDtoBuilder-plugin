@@ -56,10 +56,3 @@ jacocoTestReport {
     description = "Generate Jacoco coverage reports after running tests."
     additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
 }
-
-/*cobertura {
-    rootProject.subprojects.each {
-        coverageDirs << file("${it.name}/build/classes/main")
-    }
-}*/
-//cobertura.coverageFormats = ['html', 'xml']

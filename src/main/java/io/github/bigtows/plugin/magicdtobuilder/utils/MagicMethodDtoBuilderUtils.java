@@ -17,7 +17,7 @@ import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings
 /**
  * Utils method's for best development
  */
-public class MagicMethodDtoBuilderUtils {
+public final class MagicMethodDtoBuilderUtils {
 
     /**
      * Detect magic method dto builder

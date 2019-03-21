@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Utils helpful methods for php typed elements
  */
-public class PhpTypedElementMagicDtoBuilderUtils {
+public final class PhpTypedElementMagicDtoBuilderUtils {
 
     @Nullable
     public static String getDtoNameByPhpTypedElement(PhpTypedElement typedElement) {

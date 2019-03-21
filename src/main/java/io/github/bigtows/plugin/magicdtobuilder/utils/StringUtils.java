@@ -13,7 +13,7 @@ package io.github.bigtows.plugin.magicdtobuilder.utils;
 /**
  * Utils method for String class
  */
-public class StringUtils {
+public final class StringUtils {
 
     /**
      * Upper first char in text

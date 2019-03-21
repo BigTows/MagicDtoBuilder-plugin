@@ -8,7 +8,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package test.uniteller.plugin.magicdtobuilder;
+package test.uniteller.plugin.magicdtobuilder.bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * The type Assert php local inspection data.
  */
-public final class AssertPhpLocalInspectionData {
+public final class AssertPhpLocalInspectionBundle {
 
     private final String templateDescription;
 
@@ -30,7 +30,7 @@ public final class AssertPhpLocalInspectionData {
      * @param templateDescription the template description
      * @param offsetTextProblem   the offset text problem
      */
-    public AssertPhpLocalInspectionData(final String templateDescription, Integer offsetTextProblem) {
+    public AssertPhpLocalInspectionBundle(final String templateDescription, Integer offsetTextProblem) {
         this.templateDescription = templateDescription;
         this.offsetTextProblem = offsetTextProblem;
     }
@@ -59,7 +59,7 @@ public final class AssertPhpLocalInspectionData {
      * @param clazz the clazz
      * @return the assert php local inspection data
      */
-    public AssertPhpLocalInspectionData addQuickFixClasses(Class clazz) {
+    public AssertPhpLocalInspectionBundle addQuickFixClasses(Class clazz) {
         storageQuickFixClasses.add(clazz);
         return this;
     }
@@ -80,7 +80,7 @@ public final class AssertPhpLocalInspectionData {
      * @param offsetTextProblem   the offset text problem
      * @return the assert php local inspection data
      */
-    public static AssertPhpLocalInspectionData build(final String templateDescription, Integer offsetTextProblem) {
-        return new AssertPhpLocalInspectionData(templateDescription, offsetTextProblem);
+    public static AssertPhpLocalInspectionBundle build(final String templateDescription, Integer offsetTextProblem) {
+        return new AssertPhpLocalInspectionBundle(templateDescription, offsetTextProblem);
     }
 }
