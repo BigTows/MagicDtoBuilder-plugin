@@ -4,7 +4,7 @@ import io.github.bigtows.plugin.magicdtobuilder.utils.StringUtils;
 import org.junit.Assert;
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 
-public class TestUtils extends BaseTestIntellij {
+public class TestStringUtils extends BaseTestIntellij {
 
     public void testStringUtils() {
         Assert.assertEquals("A", StringUtils.toUpperFirstChar("a"));

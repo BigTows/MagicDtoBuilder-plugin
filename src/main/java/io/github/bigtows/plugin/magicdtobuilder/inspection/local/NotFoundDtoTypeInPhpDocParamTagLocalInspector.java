@@ -53,8 +53,8 @@ public class NotFoundDtoTypeInPhpDocParamTagLocalInspector extends LocalInspecti
         String signatureMagicDtoBuilder = MagicDtoBuilderSettings.getInstance(element.getProject()).getSignatureMagicDtoBuilder();
         for (PhpDocParamTag docParamTag : function.getDocComment().getParamTags()) {
             if (typeDto != null
-                    && docParamTag.getDeclaredType().toString().contains(signatureMagicDtoBuilder)
-                    && !docParamTag.getDeclaredType().toString().contains(typeDto)) {
+                    && (!docParamTag.getDeclaredType().toString().contains(signatureMagicDtoBuilder)
+                    || !docParamTag.getDeclaredType().toString().contains(typeDto))) {
                 holder.registerProblem(
                         docParamTag,
                         "Append type dto",

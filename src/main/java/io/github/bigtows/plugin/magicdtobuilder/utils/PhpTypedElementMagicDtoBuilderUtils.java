@@ -13,6 +13,12 @@ import java.util.Set;
  */
 public final class PhpTypedElementMagicDtoBuilderUtils {
 
+    /**
+     * Get DTO name by typed php element.
+     *
+     * @param typedElement typed php element
+     * @return name of dto, or {@code null} if can't get
+     */
     @Nullable
     public static String getDtoNameByPhpTypedElement(PhpTypedElement typedElement) {
         Set<String> types = typedElement.getDeclaredType().getTypesSorted();
