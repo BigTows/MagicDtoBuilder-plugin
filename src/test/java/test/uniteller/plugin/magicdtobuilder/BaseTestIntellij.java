@@ -32,6 +32,9 @@ import org.junit.Assert;
 import test.uniteller.plugin.magicdtobuilder.bundle.AssertPhpAnnotatorBundle;
 import test.uniteller.plugin.magicdtobuilder.bundle.AssertPhpLocalInspectionBundle;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 
@@ -123,6 +126,16 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
         if (data == null && problemDescriptorList.size() > 0) {
             fail("Founded extra problem descriptor");
         }
+    }
+
+    /**
+     * Get php local inspection contains list.
+     *
+     * @param filePath the file path
+     * @return the list
+     */
+    protected List<ProblemDescriptor> getPhpLocalInspectionContains(@NotNull String filePath) {
+        return getPhpProblemsDescriptor(filePath);
     }
 
     /**
@@ -264,6 +277,17 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
                 super.visitElement(element);
             }
         });
+    }
+
+
+    protected String getTextFromFile(@NotNull String filePath) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        try {
+            return new String(Files.readAllBytes(new File(classLoader.getResource(filePath).getFile()).toPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 

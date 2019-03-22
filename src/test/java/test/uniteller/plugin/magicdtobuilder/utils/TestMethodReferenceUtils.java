@@ -43,6 +43,4 @@ public class TestMethodReferenceUtils extends BaseTestIntellij {
         when(methodReference.getFirstChild()).thenThrow(new MockitoException(""));
         Assert.assertEquals(methodReference, MethodReferenceUtils.getFirstMethodReference(methodReference));
     }
-
-
 }
