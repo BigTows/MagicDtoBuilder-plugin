@@ -3,6 +3,7 @@ package test.uniteller.plugin.magicdtobuilder.utils;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 import org.junit.Assert;
+import org.mockito.exceptions.base.MockitoException;
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
 
 import static org.mockito.Mockito.mock;
@@ -39,7 +40,7 @@ public class TestMethodReferenceUtils extends BaseTestIntellij {
      */
     public void testMethodReferenceThrowOnGettingFirstChild() {
         MethodReference methodReference = mock(MethodReference.class);
-        when(methodReference.getFirstChild()).thenThrow(Exception.class);
+        when(methodReference.getFirstChild()).thenThrow(new MockitoException(""));
         Assert.assertEquals(methodReference, MethodReferenceUtils.getFirstMethodReference(methodReference));
     }
 
