@@ -18,6 +18,7 @@ public class TestDtoBuilderTypeProvider extends BaseTestIntellij {
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
+        myFixture.configureByFile("libs/AbstractDto.php");
         myFixture.configureByFile("libs/ExampleDto.php");
         warmUpPhpIndex();
     }
@@ -57,6 +58,7 @@ public class TestDtoBuilderTypeProvider extends BaseTestIntellij {
         Assert.assertArrayEquals(new String[]{
                 "#M#C\\App\\Library\\ExampleApi\\ExampleDto.setUrl",
                 "#M#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create.setUrl",
+                "\\App\\Library\\DtoBuilder\\DtoBuilder",
                 "\\App\\Library\\ExampleApi\\ExampleDto"
         }, stringSet.toArray());
     }

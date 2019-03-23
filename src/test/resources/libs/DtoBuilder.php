@@ -11,4 +11,9 @@ class DtoBuilder
     {
         return new DtoBuilder($classNameOfDto);
     }
+
+    public final function build(): AbstractDto
+    {
+
+    }
 }

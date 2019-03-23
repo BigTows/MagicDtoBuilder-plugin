@@ -17,10 +17,11 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
-import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
-import org.jetbrains.annotations.Nullable;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import io.github.bigtows.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
 import io.github.bigtows.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -57,9 +58,12 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
             phpType = this.getPhpTypeOfPhpClassByParameterMagicMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
-            phpType = PhpType.builder().add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
-                    MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
-            )).build();
+            phpType = PhpType.builder()
+                    .add(MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureMagicDtoBuilder())
+                    .add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
+                            MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
+                            )
+                    ).build();
         } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
             phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
@@ -83,7 +87,8 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             if (phpClassOptional.isPresent()) {
                 return PhpType.builder().add(phpClassOptional.get().getFQN()).build();
             }
-        } catch (IndexNotReadyException ignore) {}
+        } catch (IndexNotReadyException ignore) {
+        }
         return null;
     }
 

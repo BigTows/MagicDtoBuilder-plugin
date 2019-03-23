@@ -1,6 +1,7 @@
 <?php
 namespace App\Library\ExampleApi;
-class ExampleDtoWithPrivateProperty
+use App\Library\DtoBuilder\AbstractDto;
+class ExampleDtoWithPrivateProperty extends AbstractDto
 {
     /**
      * Url host

@@ -27,7 +27,7 @@ public final class PhpTypedElementMagicDtoBuilderUtils {
         List<String> result = new ArrayList<>();
         boolean hasMagicPartDtoBuilder = false;
         for (String type : types) {
-            if (!hasMagicPartDtoBuilder && type.contains(signatureMagicDtoBuilder)) {
+            if (type.contains(signatureMagicDtoBuilder)) {
                 hasMagicPartDtoBuilder = true;
                 continue;
             }

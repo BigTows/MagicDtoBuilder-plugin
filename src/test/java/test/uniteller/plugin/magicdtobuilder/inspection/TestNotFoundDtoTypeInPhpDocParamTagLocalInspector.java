@@ -24,12 +24,13 @@ import test.uniteller.plugin.magicdtobuilder.bundle.AssertPhpLocalInspectionBund
  *
  * @see com.intellij.codeInspection.LocalInspectionTool
  */
-public class TestLocalInspection extends BaseTestIntellij {
+public class TestNotFoundDtoTypeInPhpDocParamTagLocalInspector extends BaseTestIntellij {
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
+        myFixture.configureByFile("libs/AbstractDto.php");
         myFixture.configureByFile("libs/ExampleDto.php");
         warmUpPhpIndex();
     }

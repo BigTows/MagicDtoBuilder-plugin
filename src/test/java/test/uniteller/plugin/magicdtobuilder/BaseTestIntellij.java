@@ -25,6 +25,8 @@ import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
+import com.jetbrains.php.lang.psi.elements.MemberReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -165,7 +167,9 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
                         if (psiElementAtCaret == null) {
                             return;
                         }
-                        if (psiElementAtCaret.getParent() instanceof FunctionReference) {
+                        if (psiElementAtCaret.getParent() instanceof MemberReference) {
+                            ((PhpElementVisitor) psiElementVisitor).visitPhpMethodReference((MethodReference) psiElementAtCaret.getParent());
+                        } else if (psiElementAtCaret.getParent() instanceof FunctionReference) {
                             ((PhpElementVisitor) psiElementVisitor).visitPhpFunctionCall((FunctionReference) psiElementAtCaret.getParent());
                         }
                         super.visitElement(element);

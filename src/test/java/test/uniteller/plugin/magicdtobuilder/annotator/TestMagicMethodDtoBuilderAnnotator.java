@@ -14,6 +14,7 @@ public class TestMagicMethodDtoBuilderAnnotator extends BaseTestIntellij {
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
+        myFixture.configureByFile("libs/AbstractDto.php");
         myFixture.configureByFile("libs/ExampleDto.php");
         myFixture.configureByFile("libs/ExampleDtoWithPrivateProperty.php");
         warmUpPhpIndex();
