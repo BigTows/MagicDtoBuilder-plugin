@@ -17,6 +17,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocParamTag;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
+import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +43,9 @@ public class AppendDtoClassIntoPhpDocParamTagQuickFix implements LocalQuickFix {
             return;
         }
         PhpDocParamTag phpDocParamTag = (PhpDocParamTag) descriptor.getPsiElement();
+        String fqnDtoBuilder = MagicDtoBuilderSettings.getInstance(project).getSignatureMagicDtoBuilder();
         String phpDocText = phpDocParamTag.getParent().getText();
-        phpDocText = phpDocText.replace(phpDocParamTag.getText(), "@param " + phpDocParamTag.getDeclaredType().toString() + "|" + typeOfDto + " $" + phpDocParamTag.getVarName());
+        phpDocText = phpDocText.replace(phpDocParamTag.getText(), "@param " + fqnDtoBuilder + "|" + typeOfDto + " $" + phpDocParamTag.getVarName());
         PsiElement psiElement = PhpPsiElementFactory.createFromText(phpDocParamTag.getProject(), PhpDocComment.class, phpDocText);
         if (psiElement == null) {
             //Log error.

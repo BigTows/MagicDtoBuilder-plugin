@@ -13,6 +13,7 @@ package io.github.bigtows.plugin.magicdtobuilder.annotator;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
@@ -46,6 +47,7 @@ public class PhpMagicMethodDtoBuilderVisitor extends PhpElementVisitor {
         if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(reference)) {
             this.checkSetterMagicOnMaintenanceParams(reference);
         }
+
         if (annotationHolder instanceof Collection && MagicMethodDtoBuilderUtils.isMagicMethodDtoBuilder(reference)) {
             this.removeAnnotationAboutMemberHasPrivateAccess((Collection) annotationHolder);
         }

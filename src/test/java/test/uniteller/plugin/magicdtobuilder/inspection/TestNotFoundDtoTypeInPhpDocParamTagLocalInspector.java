@@ -10,21 +10,27 @@
 
 package test.uniteller.plugin.magicdtobuilder.inspection;
 
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.QuickFix;
+import com.intellij.openapi.command.WriteCommandAction;
 import io.github.bigtows.plugin.magicdtobuilder.inspection.local.fix.AppendDtoClassIntoPhpDocParamTagQuickFix;
-import test.uniteller.plugin.magicdtobuilder.AssertPhpLocalInspectionData;
+import org.junit.Assert;
 import test.uniteller.plugin.magicdtobuilder.BaseTestIntellij;
+import test.uniteller.plugin.magicdtobuilder.bundle.AssertPhpLocalInspectionBundle;
 
 /**
  * Unit tests for local inspection
  *
  * @see com.intellij.codeInspection.LocalInspectionTool
  */
-public class TestLocalInspection extends BaseTestIntellij {
+public class TestNotFoundDtoTypeInPhpDocParamTagLocalInspector extends BaseTestIntellij {
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
+        myFixture.configureByFile("libs/AbstractDto.php");
         myFixture.configureByFile("libs/ExampleDto.php");
         warmUpPhpIndex();
     }
@@ -35,9 +41,21 @@ public class TestLocalInspection extends BaseTestIntellij {
     public void testUpdatePhpDocParamTag() {
         assertPhpLocalInspectionContains(
                 "data/inspection/UpdatePhpDocParamTag.php",
-                AssertPhpLocalInspectionData.build("Append type dto", 93)
+                AssertPhpLocalInspectionBundle.build("Append type dto", 93)
                         .addQuickFixClasses(AppendDtoClassIntoPhpDocParamTagQuickFix.class)
         );
+
+        ProblemDescriptor problemDescriptor = getPhpLocalInspectionContains("data/inspection/UpdatePhpDocParamTag.php").get(0);
+        if (problemDescriptor.getFixes() == null || problemDescriptor.getFixes().length != 1) {
+            fail("Can't find fixes");
+            return;
+        }
+        LocalQuickFix quickFix = (LocalQuickFix) problemDescriptor.getFixes()[0];
+        WriteCommandAction.runWriteCommandAction(myFixture.getProject(), () -> {
+            quickFix.applyFix(myFixture.getProject(), problemDescriptor);
+            String resultText = getPsiElementAtCaret().getParent().getParent().getParent().getText();
+            Assert.assertEquals(getTextFromFile("data/inspection/UpdatePhpDocParamTagAfterQuickFix.php"), resultText);
+        });
     }
 
     /**
@@ -46,7 +64,7 @@ public class TestLocalInspection extends BaseTestIntellij {
     public void testUpdatePhpDocParamTagIfFunctionReferenceStorageInFunction() {
         assertPhpLocalInspectionContains(
                 "data/inspection/UpdatePhpDocParamTagIfFunctionReferenceStorageInFunction.php",
-                AssertPhpLocalInspectionData.build("Append type dto", 144)
+                AssertPhpLocalInspectionBundle.build("Append type dto", 144)
                         .addQuickFixClasses(AppendDtoClassIntoPhpDocParamTagQuickFix.class)
         );
     }

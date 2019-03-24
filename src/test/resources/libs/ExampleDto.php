@@ -1,6 +1,7 @@
 <?php
 namespace App\Library\ExampleApi;
-class ExampleDto
+use App\Library\DtoBuilder\AbstractDto;
+class ExampleDto extends AbstractDto
 {
     /**
      * Url host

@@ -23,6 +23,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void setUp() throws Exception {
         super.setUp();
         myFixture.configureByFile("libs/DtoBuilder.php");
+        myFixture.configureByFile("libs/AbstractDto.php");
         myFixture.configureByFile("libs/ExampleDto.php");
         myFixture.configureByFile("libs/ExampleDtoWithTrait.php");
         myFixture.configureByFile("libs/TraitDto.php");
@@ -33,7 +34,8 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
      */
     public void testCompletionForMagicMethodDtoBuilderCreate() {
         assertPhpCompletionContains("data/completion/completionForMagicCreateMethod.php",
-                "getUrl()", "setUrl()", "hasUrl()");
+                "getUrl()", "setUrl()", "hasUrl()", "build"
+        );
     }
 
     /**
@@ -42,7 +44,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void testCompletionForVariable() {
         assertPhpCompletionContains(
                 "data/completion/completionForVariable.php",
-                "getUrl()", "setUrl()", "hasUrl()"
+                "getUrl()", "setUrl()", "hasUrl()", "build"
         );
     }
 
@@ -52,7 +54,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void testCompletionAfterSetterMethod() {
         assertPhpCompletionContains(
                 "data/completion/completionAfterSetterMethod.php",
-                "getUrl()", "setUrl()", "hasUrl()"
+                "getUrl()", "setUrl()", "hasUrl()", "build"
         );
     }
 
@@ -72,7 +74,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void testCompletionAfterSetterMethodAndVariable() {
         assertPhpCompletionContains(
                 "data/completion/completionAfterSetterMethodAndVariable.php",
-                "getUrl()", "setUrl()", "hasUrl()"
+                "getUrl()", "setUrl()", "hasUrl()", "build"
         );
     }
 
@@ -82,7 +84,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void testCompletionForVariableWithPhpDoc() {
         assertPhpCompletionContains(
                 "data/completion/completionForVariableWithPhpDoc.php",
-                "getUrl()", "setUrl()", "hasUrl()"
+                "getUrl()", "setUrl()", "hasUrl()", "build"
         );
     }
 
@@ -91,7 +93,8 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
      */
     public void testCompletionForVariableWithInvalidPhpDoc() {
         assertPhpCompletionContains(
-                "data/completion/completionForVariableWithInvalidPhpDoc.php"
+                "data/completion/completionForVariableWithInvalidPhpDoc.php",
+                "build"
         );
     }
 
@@ -101,7 +104,7 @@ public final class TestMagicMethodCompletionProvider extends BaseTestIntellij {
     public void testCompletionForDtoWithTrait() {
         assertPhpCompletionContains(
                 "data/completion/completionForDtoWithTrait.php",
-                "getDataTrait()", "getUrl()", "hasDataTrait()", "hasUrl()", "setDataTrait()", "setUrl()"
+                "getDataTrait()", "getUrl()", "hasDataTrait()", "hasUrl()", "setDataTrait()", "setUrl()", "build"
         );
     }
 

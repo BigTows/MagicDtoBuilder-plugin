@@ -39,6 +39,8 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
      */
     private String signatureMethodMagicDtoBuilderCreate = "#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create";
 
+    private String signatureAbstractDto = "\\App\\Library\\DtoBuilder\\AbstractDto";
+
     /**
      * Get instance of plugin settings
      *
@@ -71,6 +73,10 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
 
     public String getSignatureMagicDtoBuilder() {
         return signatureMethodMagicDtoBuilderCreate.replace("#M#C", "").split(Pattern.quote("."))[0];
+    }
+
+    public String getSignatureAbstractDto() {
+        return signatureAbstractDto;
     }
 
     /**

@@ -1,6 +1,10 @@
+# Project status 
 
-### Master [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=master)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
-### Dev [![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=refactore-code)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)
+| Branch | Travis                                                                                                                                        | Coveralls                                                                                                                                                                             |   |
+|--------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
+| master |[![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=master)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)| [![Coverage Status](https://coveralls.io/repos/github/BigTows/MagicDtoBuilder-plugin/badge.svg?branch=dev)](https://coveralls.io/github/BigTows/MagicDtoBuilder-plugin?branch=master) |   |
+| dev    |[![Build Status](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin.svg?branch=dev)](https://travis-ci.org/BigTows/MagicDtoBuilder-plugin)   | [![Coverage Status](https://coveralls.io/repos/github/BigTows/MagicDtoBuilder-plugin/badge.svg?branch=dev)](https://coveralls.io/github/BigTows/MagicDtoBuilder-plugin?branch=dev)    |   |
+
 
 ---
 

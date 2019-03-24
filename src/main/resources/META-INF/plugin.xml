@@ -38,6 +38,13 @@
                          enabledByDefault="true" level="WARNING"
                          language="PHP"
                          implementationClass="io.github.bigtows.plugin.magicdtobuilder.inspection.local.NotFoundDtoTypeInPhpDocParamTagLocalInspector"/>
+
+        <localInspection groupPath="MagicDtoBuilder" shortName="InvalidDto"
+                         displayName="Dto can be extended at AbstractDto"
+                         groupName="InvalidDto"
+                         enabledByDefault="true" level="WARNING"
+                         language="PHP"
+                         implementationClass="io.github.bigtows.plugin.magicdtobuilder.inspection.local.InvalidDtoLocalInspector"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
