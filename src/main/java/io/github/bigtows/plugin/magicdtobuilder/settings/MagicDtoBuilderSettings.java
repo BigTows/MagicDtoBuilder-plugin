@@ -24,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.regex.Pattern;
 
+/**
+ * The type Magic dto builder settings.
+ */
 @State(
         name = "MagicDtoBuilderSettings",
         storages = {
@@ -39,13 +42,15 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
      */
     private String signatureMethodMagicDtoBuilderCreate = "#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create";
 
+    private String signatureMethodMagicDtoBuilderBuild = "#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.build";
+
     private String signatureAbstractDto = "\\App\\Library\\DtoBuilder\\AbstractDto";
 
     /**
      * Get instance of plugin settings
      *
      * @param project project instance
-     * @return self
+     * @return self instance
      */
     public static MagicDtoBuilderSettings getInstance(Project project) {
         return ServiceManager.getService(project, MagicDtoBuilderSettings.class);
@@ -65,16 +70,35 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
     /**
      * Get signature for method magic dto builder create
      *
-     * @return signature
+     * @return signature signature method magic dto builder create
      */
     public String getSignatureMethodMagicDtoBuilderCreate() {
         return signatureMethodMagicDtoBuilderCreate;
     }
 
+    /**
+     * Gets signature method magic dto builder build.
+     *
+     * @return the signature method magic dto builder build
+     */
+    public String getSignatureMethodMagicDtoBuilderBuild() {
+        return signatureMethodMagicDtoBuilderBuild;
+    }
+
+    /**
+     * Gets signature magic dto builder.
+     *
+     * @return the signature magic dto builder
+     */
     public String getSignatureMagicDtoBuilder() {
         return signatureMethodMagicDtoBuilderCreate.replace("#M#C", "").split(Pattern.quote("."))[0];
     }
 
+    /**
+     * Gets signature abstract dto.
+     *
+     * @return the signature abstract dto
+     */
     public String getSignatureAbstractDto() {
         return signatureAbstractDto;
     }
@@ -82,9 +106,10 @@ public class MagicDtoBuilderSettings implements PersistentStateComponent<MagicDt
     /**
      * Get icon for public method icon
      * <p>
-     *     Support lazy load.
+     * Support lazy load.
      * </p>
-     * @return Icon
+     *
+     * @return Icon public method icon
      */
     public static Icon getPublicMethodIcon() {
         if (PUBLIC_METHOD_ICON == null) {

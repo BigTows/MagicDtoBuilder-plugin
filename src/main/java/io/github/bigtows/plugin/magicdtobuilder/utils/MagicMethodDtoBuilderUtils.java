@@ -36,6 +36,21 @@ public final class MagicMethodDtoBuilderUtils {
     }
 
     /**
+     * Detect magic method dto builder
+     *
+     * @param methodReference method reference
+     * @return {@code true} is magic method dto builder else {@code false}
+     */
+    public static boolean isBuildMethodDtoBuilder(MethodReference methodReference) {
+        String signatureMethodBuild = MagicDtoBuilderSettings.getInstance(
+                methodReference.getProject()
+        ).getSignatureMethodMagicDtoBuilderBuild();
+
+        return methodReference.getSignature().contains(signatureMethodBuild)
+                && methodReference.getParameters().length == 0;
+    }
+
+    /**
      * Detect any magic method in method reference
      *
      * @param methodReference method reference

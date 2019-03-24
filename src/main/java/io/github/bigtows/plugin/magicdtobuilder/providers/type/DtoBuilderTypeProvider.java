@@ -32,6 +32,8 @@ import java.util.Set;
  */
 public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
 
+    public static String DTO_BUILDER_POSTFIX = "Builder";
+
     @Override
     public char getKey() {
         return 'Đ';
@@ -62,12 +64,19 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
                     .add(MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureMagicDtoBuilder())
                     .add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
                             MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
-                            )
+                            ) + DTO_BUILDER_POSTFIX
                     ).build();
         } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
             phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
             phpType = PhpType.BOOLEAN;
+        } else if (MagicMethodDtoBuilderUtils.isBuildMethodDtoBuilder(methodReference)) {
+            phpType = PhpType.builder()
+                    .add(MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureAbstractDto())
+                    .add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
+                            MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
+                            )
+                    ).build();
         }
         return phpType;
     }
@@ -85,7 +94,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         try {
             Optional<PhpClass> phpClassOptional = phpIndex.getClassesByFQN(FQN).stream().findFirst();
             if (phpClassOptional.isPresent()) {
-                return PhpType.builder().add(phpClassOptional.get().getFQN()).build();
+                return PhpType.builder().add(phpClassOptional.get().getFQN() + DTO_BUILDER_POSTFIX).build();
             }
         } catch (IndexNotReadyException ignore) {
         }

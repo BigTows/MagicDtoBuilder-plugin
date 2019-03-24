@@ -1,6 +1,7 @@
 package io.github.bigtows.plugin.magicdtobuilder.utils;
 
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import io.github.bigtows.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
 import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,12 +32,10 @@ public final class PhpTypedElementMagicDtoBuilderUtils {
                 hasMagicPartDtoBuilder = true;
                 continue;
             }
-            if (type.length() > 2) {
-                if (!type.startsWith("#M") && !type.startsWith("#C")) {
-                    result.add(type);
+            if (type.length() > DtoBuilderTypeProvider.DTO_BUILDER_POSTFIX.length()) {
+                if (!type.startsWith("#M") && !type.startsWith("#C") && type.endsWith(DtoBuilderTypeProvider.DTO_BUILDER_POSTFIX)) {
+                    result.add(type.substring(0, type.length() - DtoBuilderTypeProvider.DTO_BUILDER_POSTFIX.length()));
                 }
-            } else {
-                result.add(type);
             }
         }
         if (result.size() == 1 && hasMagicPartDtoBuilder) {
