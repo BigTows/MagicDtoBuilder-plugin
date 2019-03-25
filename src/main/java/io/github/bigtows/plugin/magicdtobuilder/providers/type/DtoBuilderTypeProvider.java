@@ -32,9 +32,11 @@ import java.util.Set;
  */
 public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
 
+    public static char SIGNATURE_KEY = '☘';
+
     @Override
     public char getKey() {
-        return 'Đ';
+        return SIGNATURE_KEY;
     }
 
     @Nullable
@@ -42,6 +44,14 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     public PhpType getType(PsiElement psiElement) {
         if (psiElement instanceof MethodReference) {
             return processMethodReference((MethodReference) psiElement);
+        } else if (psiElement instanceof Parameter) {
+            PsiElement psiElement1 = psiElement.getParent().getParent();
+            if (psiElement1 instanceof Function) {
+                Function function = (Function) psiElement1;
+                return PhpType.builder()
+                        .add(MagicDtoBuilderSettings.getInstance(function.getProject()).getSignatureMagicDtoBuilder())
+                        .add(buildBuilderDtoSignature("\\App\\Library\\ExampleApi\\ExampleDto")).build();
+            }
         }
         return null;
     }
@@ -60,9 +70,10 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
             phpType = PhpType.builder()
                     .add(MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureMagicDtoBuilder())
-                    .add(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
-                            MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
-                            )
+                    .add(this.buildBuilderDtoSignature(
+                            PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
+                                    MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
+                            ))
                     ).build();
         } else if (MagicMethodDtoBuilderUtils.isMagicGetterMethodDtoBuilder(methodReference)) {
             phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
@@ -85,7 +96,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         try {
             Optional<PhpClass> phpClassOptional = phpIndex.getClassesByFQN(FQN).stream().findFirst();
             if (phpClassOptional.isPresent()) {
-                return PhpType.builder().add(phpClassOptional.get().getFQN()).build();
+                return PhpType.builder().add(this.buildBuilderDtoSignature(phpClassOptional.get().getFQN())).build();
             }
         } catch (IndexNotReadyException ignore) {
         }
@@ -110,8 +121,19 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         return null;
     }
 
+    /**
+     * Build signature for magic builder dto
+     *
+     * @param dto FQN of DTO
+     * @return signature
+     */
+    private String buildBuilderDtoSignature(String dto) {
+        return "#" + this.getKey() + dto;
+    }
+
     @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
-        return null;
+        //TODO ... i don't know.
+        return PhpIndex.getInstance(project).getClassesByFQN(s.substring(2));
     }
 }

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package test.uniteller.plugin.magicdtobuilder.providers.type;
 
 import com.google.common.collect.Lists;
@@ -77,8 +87,8 @@ public class TestDtoBuilderTypeProvider extends BaseTestIntellij {
 
 
         Assert.assertArrayEquals(new String[]{
-                "#M#C\\App\\Library\\ExampleApi\\ExampleDto.getUrl",
                 "#M#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create.getUrl",
+                "#M#☘\\App\\Library\\ExampleApi\\ExampleDto.getUrl",
                 "\\string"
         }, stringSet.toArray());
     }

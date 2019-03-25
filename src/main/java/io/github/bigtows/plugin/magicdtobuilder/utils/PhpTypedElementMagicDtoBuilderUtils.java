@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) MagicDtoBuilder-plugin (2019)
+ *
+ * Authors:
+ *    Andrey <and-rey2@yandex.ru> Malofeykin
+ *    Alexander <gasfull98@gmail.com> Chapchuk
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package io.github.bigtows.plugin.magicdtobuilder.utils;
 
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import io.github.bigtows.plugin.magicdtobuilder.providers.type.DtoBuilderTypeProvider;
 import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +43,8 @@ public final class PhpTypedElementMagicDtoBuilderUtils {
                 continue;
             }
             if (type.length() > 2) {
-                if (!type.startsWith("#M") && !type.startsWith("#C")) {
-                    result.add(type);
+                if (!type.startsWith("#M") && !type.startsWith("#C") && type.startsWith("#" + DtoBuilderTypeProvider.SIGNATURE_KEY)) {
+                    result.add(type.substring(2));
                 }
             } else {
                 result.add(type);
