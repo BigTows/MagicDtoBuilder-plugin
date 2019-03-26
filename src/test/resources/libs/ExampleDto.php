@@ -8,4 +8,11 @@ class ExampleDto extends AbstractDto
      * @var string
      */
     protected $url;
+
+
+
+    public function toString()
+    {
+        return "DTO: ".$url;
+    }
 }

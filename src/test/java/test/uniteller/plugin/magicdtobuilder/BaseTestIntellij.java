@@ -78,7 +78,7 @@ public abstract class BaseTestIntellij extends LightCodeInsightFixtureTestCase {
         if (lookupElements == null) {
             fail("Error completionContainsAssert. (myFixture.getLookupElementStrings return NULL)");
         }
-        if (exceptedLookupElementStrings.length == 0 && lookupElements.size() != 0) {
+        if (exceptedLookupElementStrings.length != lookupElements.size()) {
             fail(String.format(
                     "Lookup elements constrains unnecessary data. Available: %s",
                     String.join(", ", lookupElements))

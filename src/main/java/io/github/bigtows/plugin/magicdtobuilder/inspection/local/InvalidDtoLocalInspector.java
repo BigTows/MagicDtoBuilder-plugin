@@ -69,7 +69,7 @@ public class InvalidDtoLocalInspector extends LocalInspectionTool {
                 String FQN = phpExpression.getDeclaredType().toString();
                 Collection<PhpClass> phpClassCollection = PhpIndex.getInstance(methodReference.getProject()).getClassesByFQN(FQN);
                 String fqnAbstractDto = MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureAbstractDto();
-                if (phpClassCollection.stream().noneMatch(PhpClassUtils::isPhpClassExtentedAbstractDto)) {
+                if (phpClassCollection.stream().noneMatch(PhpClassUtils::isPhpClassExtendedAbstractDto)) {
                     holder.registerProblem(methodReference.getParameterList(), "DTO must extended at " + fqnAbstractDto, ProblemHighlightType.ERROR);
                 }
             }

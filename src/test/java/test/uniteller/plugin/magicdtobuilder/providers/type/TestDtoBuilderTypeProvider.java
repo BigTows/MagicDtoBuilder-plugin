@@ -47,8 +47,8 @@ public class TestDtoBuilderTypeProvider extends BaseTestIntellij {
 
 
         Assert.assertArrayEquals(new String[]{
-                "#M#C\\App\\Library\\ExampleApi\\ExampleDto.hasUrl",
                 "#M#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create.hasUrl",
+                "#M#☘\\App\\Library\\ExampleApi\\ExampleDto.hasUrl",
                 "\\bool"
         }, stringSet.toArray());
     }
@@ -66,10 +66,10 @@ public class TestDtoBuilderTypeProvider extends BaseTestIntellij {
 
 
         Assert.assertArrayEquals(new String[]{
-                "#M#C\\App\\Library\\ExampleApi\\ExampleDto.setUrl",
                 "#M#M#C\\App\\Library\\DtoBuilder\\DtoBuilder.create.setUrl",
-                "\\App\\Library\\DtoBuilder\\DtoBuilder",
-                "\\App\\Library\\ExampleApi\\ExampleDto"
+                "#M#☘\\App\\Library\\ExampleApi\\ExampleDto.setUrl",
+                "#☘\\App\\Library\\ExampleApi\\ExampleDto",
+                "\\App\\Library\\DtoBuilder\\DtoBuilder"
         }, stringSet.toArray());
     }
 

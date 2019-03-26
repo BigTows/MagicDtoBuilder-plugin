@@ -13,20 +13,39 @@ package io.github.bigtows.plugin.magicdtobuilder.utils;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 
+import java.util.Arrays;
+
+/**
+ * The type Php class utils.
+ */
 public class PhpClassUtils {
 
 
-    public static boolean isPhpClassExtentedAbstractDto(PhpClass phpClass) {
+    /**
+     * Is php class extended abstract dto boolean.
+     *
+     * @param phpClass the php class
+     * @return the boolean
+     */
+    public static boolean isPhpClassExtendedAbstractDto(PhpClass phpClass) {
         String fqnAbstractDto = MagicDtoBuilderSettings.getInstance(phpClass.getProject()).getSignatureAbstractDto();
-        return isPhpClassExtentedFQNClass(phpClass, fqnAbstractDto);
+        return isPhpClassExtendedFQNClass(phpClass, fqnAbstractDto);
     }
 
-    public static boolean isPhpClassExtentedFQNClass(PhpClass phpClass, String FQN) {
+    /**
+     * Is php class extended fqn class boolean.
+     *
+     * @param phpClass the php class
+     * @param FQN      the fqn
+     * @return the boolean
+     */
+    public static boolean isPhpClassExtendedFQNClass(PhpClass phpClass, String FQN) {
         for (PhpClass superPhpClass : phpClass.getSupers()) {
             if (superPhpClass.getDeclaredType().toString().equals(FQN)) {
                 return true;
             }
-            if (phpClass.getSuperClass() != null && isPhpClassExtentedFQNClass(phpClass.getSuperClass(), FQN)) {
+
+            if (Arrays.stream(superPhpClass.getSupers()).anyMatch(superSuperPhpClass -> isPhpClassExtendedFQNClass(superSuperPhpClass, FQN))) {
                 return true;
             }
         }

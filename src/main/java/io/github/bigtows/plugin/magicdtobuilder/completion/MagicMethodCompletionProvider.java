@@ -15,6 +15,7 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
@@ -55,12 +56,18 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
      * @param resultSet       completion set
      */
     private void addCompletionsOfPhpTypedElement(PhpTypedElement phpTypedElement, CompletionResultSet resultSet) {
-        PhpClass phpClass = getDtoClassByPhpTypedElement(phpTypedElement);
+        PhpClass phpClass = this.getBuilderDtoClassByPhpTypedElement(phpTypedElement);
         if (phpClass != null) {
             String fqnOfDto = PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(phpTypedElement);
             String signatureMagicDtoBuilder = MagicDtoBuilderSettings.getInstance(phpClass.getProject()).getSignatureMagicDtoBuilder();
             phpClass.getFields().forEach(field -> resultSet.addAllElements(
-                    this.createMethodLookupElementByField(field, signatureMagicDtoBuilder + "|" + fqnOfDto)
+                    this.createAccessorMethodLookupElementByField(field, signatureMagicDtoBuilder + "|" + fqnOfDto)
+            ));
+        }
+        phpClass = this.getDtoClassByPhpTypedElement(phpTypedElement);
+        if (phpClass != null) {
+            phpClass.getFields().forEach(field -> resultSet.addAllElements(
+                    this.createProviderMethodLookupElementByField(field)
             ));
         }
     }
@@ -72,20 +79,51 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
      * @return if success PHPClass else {@code null}
      */
     @Nullable
-    private PhpClass getDtoClassByPhpTypedElement(@NotNull PhpTypedElement phpTypedElement) {
+    private PhpClass getBuilderDtoClassByPhpTypedElement(@NotNull PhpTypedElement phpTypedElement) {
         String FQN = null;
         if (phpTypedElement instanceof MethodReference) {
             FQN = this.getFQNByMethodReference((MethodReference) phpTypedElement);
         } else if (phpTypedElement instanceof Variable) {
             FQN = PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(phpTypedElement);
         }
+        return this.getAnyClassByFQN(phpTypedElement.getProject(), FQN);
+    }
+
+    /**
+     * Get PHPClass DTO by psi element (MethodReference, Variable)
+     *
+     * @param phpTypedElement php typed element
+     * @return if success PHPClass else {@code null}
+     */
+    @Nullable
+    private PhpClass getDtoClassByPhpTypedElement(@NotNull PhpTypedElement phpTypedElement) {
+        String FQN = null;
+        MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(phpTypedElement.getProject());
+        if (phpTypedElement.getDeclaredType().getTypesSorted().stream()
+                .noneMatch(type -> type.equals(settings.getSignatureMagicDtoBuilder()))) {
+            if (phpTypedElement instanceof MethodReference || phpTypedElement instanceof Variable) {
+                FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpTypedElement);
+            }
+        }
+        return this.getAnyClassByFQN(phpTypedElement.getProject(), FQN);
+    }
+
+    /**
+     * Get any class by FQN
+     *
+     * @param project project
+     * @param FQN     FQN
+     * @return PhpClass of NULL
+     */
+    @Nullable
+    private PhpClass getAnyClassByFQN(@NotNull Project project, @Nullable String FQN) {
         if (FQN != null) {
-            final PhpIndex phpIndex = PhpIndex.getInstance(phpTypedElement.getProject());
-            //Return only 1 phpclass, mb need return many...
+            final PhpIndex phpIndex = PhpIndex.getInstance(project);
             return phpIndex.getClassesByFQN(FQN).stream().findFirst().orElse(null);
         }
         return null;
     }
+
 
     /**
      * Get FQN class DTO by method reference
@@ -112,14 +150,8 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
         return null;
     }
 
-    /**
-     * Create lookup elements by field
-     *
-     * @param field            field on the basis of which creating lookup elements
-     * @param returnTypeSetter return type for setter
-     * @return lookup elements
-     */
-    private List<LookupElement> createMethodLookupElementByField(@NotNull Field field, String returnTypeSetter) {
+
+    private List<LookupElement> createAccessorMethodLookupElementByField(@NotNull Field field, String returnTypeSetter) {
         List<LookupElement> lookupElements = new ArrayList<>();
         String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
         Icon publicMethodIcon = MagicDtoBuilderSettings.getPublicMethodIcon();
@@ -129,6 +161,20 @@ public class MagicMethodCompletionProvider extends CompletionProvider<Completion
                         .withTypeText(returnTypeSetter)
                         .withIcon(publicMethodIcon)
         );
+        lookupElements.addAll(this.createProviderMethodLookupElementByField(field));
+        return lookupElements;
+    }
+
+    /**
+     * Create lookup elements by field
+     *
+     * @param field field on the basis of which creating lookup elements
+     * @return lookup elements
+     */
+    private List<LookupElement> createProviderMethodLookupElementByField(@NotNull Field field) {
+        List<LookupElement> lookupElements = new ArrayList<>();
+        String preparedNameField = StringUtils.toUpperFirstChar(field.getName());
+        Icon publicMethodIcon = MagicDtoBuilderSettings.getPublicMethodIcon();
         lookupElements.add(
                 LookupElementBuilder.create("get" + preparedNameField + "()")
                         .withPresentableText("get" + preparedNameField + "()")

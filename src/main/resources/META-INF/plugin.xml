@@ -28,9 +28,6 @@
         <!-- Append magic method's for Builder DTO (set, get, has) !-->
         <completion.contributor language="PHP"
                                 implementationClass="io.github.bigtows.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
-        <!-- Append magic method's for DTO (get, has) !-->
-        <completion.contributor language="PHP"
-                                implementationClass="io.github.bigtows.plugin.magicdtobuilder.completion.MagicMethodDtoCompletionContributor"/>
 
         <annotator language="PHP"
                    implementationClass="io.github.bigtows.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator"

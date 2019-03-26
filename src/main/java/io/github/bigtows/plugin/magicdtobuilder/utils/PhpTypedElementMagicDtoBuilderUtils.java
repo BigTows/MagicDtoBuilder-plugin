@@ -70,14 +70,12 @@ public final class PhpTypedElementMagicDtoBuilderUtils {
     @Nullable
     public static String getDtoNameByPhpTypedElement(PhpTypedElement typedElement) {
         Set<String> types = typedElement.getDeclaredType().getTypesSorted();
-        String signatureMagicDtoBuilder = MagicDtoBuilderSettings.getInstance(typedElement.getProject())
-                .getSignatureAbstractDto();
         PhpIndex phpIndex = PhpIndex.getInstance(typedElement.getProject());
         List<String> result = new ArrayList<>();
         for (String type : types) {
-            result.addAll(phpIndex.getClassesByFQN(type).stream()
-                    .filter(phpClass -> Arrays.stream(phpClass.getSupers()).anyMatch(superClass -> superClass.getFQN().equals(signatureMagicDtoBuilder)))
-                    .map(PhpNamedElement::getFQN).collect(Collectors.toList()));
+            result.addAll(phpIndex.getClassesByFQN(type).stream().filter(PhpClassUtils::isPhpClassExtendedAbstractDto)
+                    .map(PhpNamedElement::getFQN)
+                    .collect(Collectors.toList()));
         }
         if (result.size() == 1) {
             return result.get(0);
