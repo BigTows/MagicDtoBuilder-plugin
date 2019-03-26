@@ -24,13 +24,19 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
+
+        <!-- Append magic method's for Builder DTO (set, get, has) !-->
         <completion.contributor language="PHP"
                                 implementationClass="io.github.bigtows.plugin.magicdtobuilder.completion.MagicMethodCompletionContributor"/>
+        <!-- Append magic method's for DTO (get, has) !-->
+        <completion.contributor language="PHP"
+                                implementationClass="io.github.bigtows.plugin.magicdtobuilder.completion.MagicMethodDtoCompletionContributor"/>
 
         <annotator language="PHP"
                    implementationClass="io.github.bigtows.plugin.magicdtobuilder.annotator.MagicMethodDtoBuilderAnnotator"
                    order="last"/>
-        <projectService serviceImplementation="io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
+        <projectService
+                serviceImplementation="io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings"/>
 
         <localInspection groupPath="MagicDtoBuilder" shortName="NotFoundDtoType"
                          displayName="Not found Dto Type in PHPDoc"

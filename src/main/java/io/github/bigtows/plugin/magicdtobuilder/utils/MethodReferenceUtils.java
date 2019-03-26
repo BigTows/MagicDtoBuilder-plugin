@@ -70,32 +70,62 @@ public final class MethodReferenceUtils {
 
 
     /**
-     * Return name field class by provider method reference
+     * Return name field class by accessors method reference
      *
      * @param providerMethodReference method class like: "set", "get", "has"
      * @return name of field
      */
     @Nullable
-    public static String getNameFieldByProvidersMethod(MethodReference providerMethodReference) {
+    public static String getNameFieldByAccessorMethod(MethodReference providerMethodReference) {
         String nameField = providerMethodReference.getName();
         if (null == nameField || nameField.length() < 4) {
             return null;
         }
         StringBuilder nameFieldBuilder = new StringBuilder(nameField);
-        if (!MethodReferenceUtils.isPrefixProviderMethod(nameFieldBuilder.substring(0, 3))) {
+        if (!MethodReferenceUtils.isPrefixAccessorMethod(nameFieldBuilder.substring(0, 3))) {
             return null;
         }
         nameFieldBuilder.delete(0, 3);
         return Character.toLowerCase(nameFieldBuilder.charAt(0)) + nameFieldBuilder.substring(1);
     }
 
+
     /**
-     * Detect is prefix provider
+     * Return name field class by provider method reference
+     *
+     * @param providerMethodReference method class like: "getter", "has"
+     * @return name of field
+     */
+    @Nullable
+    public static String getNameFieldByProviderMethod(MethodReference providerMethodReference) {
+        String nameField = providerMethodReference.getName();
+        if (nameField == null) {
+            return null;
+        }
+        if (!MethodReferenceUtils.isPrefixProviderMethod(nameField)) {
+            return null;
+        }
+        nameField = nameField.substring(3);
+        return StringUtils.toLowerFirstChar(nameField);
+    }
+
+    /**
+     * Detect is prefix accessor
      *
      * @param prefix prefix of method
      * @return {@code true} if prefix same provider method else {@code false}
      */
-    private static boolean isPrefixProviderMethod(String prefix) {
-        return prefix.equals("set") || prefix.equals("get") || prefix.equals("has");
+    private static boolean isPrefixAccessorMethod(String prefix) {
+        return prefix.equals("set") || isPrefixProviderMethod(prefix);
+    }
+
+    /**
+     * Detect is prefix provider
+     *
+     * @param methodName method name
+     * @return {@code true} if prefix same provider method else {@code false}
+     */
+    private static boolean isPrefixProviderMethod(String methodName) {
+        return methodName.startsWith("get") || methodName.startsWith("has");
     }
 }

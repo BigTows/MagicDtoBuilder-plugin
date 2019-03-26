@@ -14,7 +14,9 @@ import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
@@ -43,15 +45,9 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Override
     public PhpType getType(PsiElement psiElement) {
         if (psiElement instanceof MethodReference) {
-            return processMethodReference((MethodReference) psiElement);
+            return this.processMethodReference((MethodReference) psiElement);
         } else if (psiElement instanceof Parameter) {
-            PsiElement psiElement1 = psiElement.getParent().getParent();
-            if (psiElement1 instanceof Function) {
-                Function function = (Function) psiElement1;
-                return PhpType.builder()
-                        .add(MagicDtoBuilderSettings.getInstance(function.getProject()).getSignatureMagicDtoBuilder())
-                        .add(buildBuilderDtoSignature("\\App\\Library\\ExampleApi\\ExampleDto")).build();
-            }
+            return this.processParameter((Parameter) psiElement);
         }
         return null;
     }
@@ -65,13 +61,14 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
     @Nullable
     private PhpType processMethodReference(MethodReference methodReference) {
         PhpType phpType = null;
+        MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(methodReference.getProject());
         if (MagicMethodDtoBuilderUtils.isCreateMethodDtoBuilder(methodReference)) {
             phpType = this.getPhpTypeOfPhpClassByParameterMagicMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicSetterMethodDtoBuilder(methodReference)) {
             phpType = PhpType.builder()
-                    .add(MagicDtoBuilderSettings.getInstance(methodReference.getProject()).getSignatureMagicDtoBuilder())
+                    .add(settings.getSignatureMagicDtoBuilder())
                     .add(this.buildBuilderDtoSignature(
-                            PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(
+                            PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(
                                     MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
                             ))
                     ).build();
@@ -79,6 +76,15 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
             phpType = PhpType.BOOLEAN;
+        } else if (
+                methodReference.resolve() != null) {
+            Method method = (Method) methodReference.resolve();
+            if (method.getContainingClass().getFQN().equals(settings.getSignatureMagicDtoBuilder()) &&
+                    method.getDeclaredType().toString().equals(settings.getSignatureAbstractDto())) {
+                phpType = PhpType.builder().add(PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(
+                        MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
+                )).build();
+            }
         }
         return phpType;
     }
@@ -119,6 +125,29 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         } catch (IndexNotReadyException ignore) {
         }
         return null;
+    }
+
+
+    private PhpType processParameter(Parameter parameter) {
+        MagicDtoBuilderSettings settings = MagicDtoBuilderSettings.getInstance(parameter.getProject());
+        if (!parameter.getDeclaredType().toString().equals(settings.getSignatureMagicDtoBuilder())
+                || !(parameter.getParent().getParent().getClass().equals(FunctionImpl.class))) {
+            return null;
+        }
+
+        Function function = (Function) parameter.getParent().getParent();
+        PhpDocComment phpDocComment = function.getDocComment();
+        if (phpDocComment == null) {
+            return null;
+        }
+        return this.getTypeParameterByPapDocComment(parameter, phpDocComment);
+    }
+
+    private PhpType getTypeParameterByPapDocComment(Parameter parameter, PhpDocComment phpDocComment) {
+        return PhpType.builder()
+                .add(MagicDtoBuilderSettings.getInstance(parameter.getProject()).getSignatureMagicDtoBuilder())
+                .add(this.buildBuilderDtoSignature("App\\Library\\ExampleApi\\InvalidExampleDto")
+                ).build();
     }
 
     /**

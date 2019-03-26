@@ -36,12 +36,17 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
         if (phpReference instanceof MethodReference) {
             MethodReference methodReference = (MethodReference) phpReference;
             PhpExpression phpExpression = methodReference.getClassReference();
-            if (phpExpression != null && phpExpression.getDeclaredType().toString().contains(this.getSignatureMagicDtoBuilder(phpExpression))) {
-                return this.getReferenceForMagicMethodDtoBuilder(methodReference);
+            if (phpExpression != null) {
+                if (phpExpression.getDeclaredType().toString().contains(this.getSignatureMagicDtoBuilder(phpExpression))) {
+                    return this.getReferenceForMagicMethodDtoBuilder(methodReference);
+                }else if (phpExpression.getDeclaredType().toString().equals(PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpExpression))){
+                    return this.getReferenceForMagicMethodDtoBuilder(methodReference);
+                }
             }
         }
         return new ArrayList<>();
     }
+
 
     /**
      * Get reference for magic method dto builder
@@ -52,7 +57,7 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
     @NotNull
     private List<PhpNamedElement> getReferenceForMagicMethodDtoBuilder(MethodReference methodReference) {
         List<PhpNamedElement> phpNamedElements = new ArrayList<>();
-        String methodName = MethodReferenceUtils.getNameFieldByProvidersMethod(methodReference);
+        String methodName = MethodReferenceUtils.getNameFieldByAccessorMethod(methodReference);
         if (null == methodName) {
             return phpNamedElements;
         }
@@ -75,7 +80,10 @@ public class MagicMethodDtoBuilderReferenceResolver implements PhpReferenceResol
      */
     @NotNull
     private Collection<PhpClass> findPhpClassInPhpTypedElement(PhpTypedElement phpTypedElement) {
-        String FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpTypedElement);
+        String FQN = PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(phpTypedElement);
+        if (FQN == null){
+            FQN = PhpTypedElementMagicDtoBuilderUtils.getDtoNameByPhpTypedElement(phpTypedElement);
+        }
         PhpIndex phpIndex = PhpIndex.getInstance(phpTypedElement.getProject());
         return phpIndex.getClassesByFQN(FQN);
     }

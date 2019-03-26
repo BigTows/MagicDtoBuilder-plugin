@@ -31,7 +31,7 @@ public class TestMethodReferenceUtils extends BaseTestIntellij {
     public void testMethodReferenceShortName() {
         MethodReference methodReference = mock(MethodReference.class);
         when(methodReference.getName()).thenReturn("a");
-        Assert.assertNull(MethodReferenceUtils.getNameFieldByProvidersMethod(methodReference));
+        Assert.assertNull(MethodReferenceUtils.getNameFieldByAccessorMethod(methodReference));
     }
 
 
@@ -41,7 +41,7 @@ public class TestMethodReferenceUtils extends BaseTestIntellij {
     public void testMethodReferenceNotProvideMethod() {
         MethodReference methodReference = mock(MethodReference.class);
         when(methodReference.getName()).thenReturn("gesA");
-        Assert.assertNull(MethodReferenceUtils.getNameFieldByProvidersMethod(methodReference));
+        Assert.assertNull(MethodReferenceUtils.getNameFieldByAccessorMethod(methodReference));
     }
 
 

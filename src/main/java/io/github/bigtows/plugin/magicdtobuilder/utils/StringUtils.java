@@ -27,4 +27,18 @@ public final class StringUtils {
         }
         return Character.toUpperCase(data.charAt(0)) + data.substring(1);
     }
+
+
+    /**
+     * Lower first char in text
+     *
+     * @param data any text
+     * @return prepared text
+     */
+    public static String toLowerFirstChar(String data) {
+        if (data.length() < 2) {
+            return data.toLowerCase();
+        }
+        return Character.toLowerCase(data.charAt(0)) + data.substring(1);
+    }
 }
