@@ -77,9 +77,11 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             phpType = this.getPhpTypeOfMagicGetterMethodDtoBuilder(methodReference);
         } else if (MagicMethodDtoBuilderUtils.isMagicHasMethodDtoBuilder(methodReference)) {
             phpType = PhpType.BOOLEAN;
-        } else if (
-                methodReference.resolve() != null) {
-            Method method = (Method) methodReference.resolve();
+        }
+
+        PsiElement resolvePsiElement = this.getResolvePsiElementAtMethodReference(methodReference);
+        if (resolvePsiElement instanceof Method) {
+            Method method = (Method) resolvePsiElement;
             if (method.getContainingClass().getFQN().equals(settings.getSignatureMagicDtoBuilder()) &&
                     (method.getDeclaredType().toString().equals(settings.getSignatureAbstractDto())
                             || PhpDoceHelper.equalsReturnPhpTypeInMethod(method, settings.getSignatureAbstractDto())
@@ -90,6 +92,21 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             }
         }
         return phpType;
+    }
+
+    /**
+     * Try get resolve for method reference
+     *
+     * @param methodReference target for searching resolve
+     * @return if can't get resolve for method reference, return {@code null} else PsiElement
+     */
+    @Nullable
+    private PsiElement getResolvePsiElementAtMethodReference(MethodReference methodReference) {
+        try {
+            return methodReference.resolve();
+        } catch (com.intellij.openapi.project.IndexNotReadyException e) {
+            return null;
+        }
     }
 
     /**
