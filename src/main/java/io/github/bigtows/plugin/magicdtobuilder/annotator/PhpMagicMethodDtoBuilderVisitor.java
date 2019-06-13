@@ -84,7 +84,9 @@ public class PhpMagicMethodDtoBuilderVisitor extends PhpElementVisitor {
             if (annotation instanceof Annotation
                     && ((Annotation) annotation).getMessage() != null
                     && (((Annotation) annotation).getMessage().equals("Member has private access")
-                    || ((Annotation) annotation).getMessage().equals("Member has protected access"))) {
+                    || ((Annotation) annotation).getMessage().equals("Member has protected access")
+                    || ((Annotation) annotation).getMessage().equals("Member has protected access, but class has magic method __call")
+            )) {
                 dataForRemove.add(annotation);
             }
         }
