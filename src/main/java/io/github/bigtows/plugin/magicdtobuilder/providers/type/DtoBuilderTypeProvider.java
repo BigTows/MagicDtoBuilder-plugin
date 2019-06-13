@@ -79,7 +79,7 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
             phpType = PhpType.BOOLEAN;
         }
 
-        PsiElement resolvePsiElement = this.getResolvePsiElementAtMethodReference(methodReference);
+        PsiElement resolvePsiElement = MethodReferenceUtils.getResolvePsiElementAtMethodReference(methodReference);
         if (resolvePsiElement instanceof Method) {
             Method method = (Method) resolvePsiElement;
             if (method.getContainingClass().getFQN().equals(settings.getSignatureMagicDtoBuilder()) &&
@@ -94,20 +94,6 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
         return phpType;
     }
 
-    /**
-     * Try get resolve for method reference
-     *
-     * @param methodReference target for searching resolve
-     * @return if can't get resolve for method reference, return {@code null} else PsiElement
-     */
-    @Nullable
-    private PsiElement getResolvePsiElementAtMethodReference(MethodReference methodReference) {
-        try {
-            return methodReference.resolve();
-        } catch (com.intellij.openapi.project.IndexNotReadyException e) {
-            return null;
-        }
-    }
 
     /**
      * Get php type of php class by parameter of magic method dto builder

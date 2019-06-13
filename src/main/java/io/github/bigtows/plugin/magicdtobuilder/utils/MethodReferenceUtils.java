@@ -10,6 +10,7 @@
 
 package io.github.bigtows.plugin.magicdtobuilder.utils;
 
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
@@ -66,6 +67,21 @@ public final class MethodReferenceUtils {
             }
         }
         return buffer;
+    }
+
+    /**
+     * Try get resolve for method reference
+     *
+     * @param methodReference target for searching resolve
+     * @return if can't get resolve for method reference, return {@code null} else PsiElement
+     */
+    @Nullable
+    public static PsiElement getResolvePsiElementAtMethodReference(MethodReference methodReference) {
+        try {
+            return methodReference.resolve();
+        } catch (IndexNotReadyException e) {
+            return null;
+        }
     }
 
 
