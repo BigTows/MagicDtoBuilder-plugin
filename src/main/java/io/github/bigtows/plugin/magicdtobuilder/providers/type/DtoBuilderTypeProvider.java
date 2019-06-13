@@ -22,6 +22,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import io.github.bigtows.plugin.magicdtobuilder.settings.MagicDtoBuilderSettings;
 import io.github.bigtows.plugin.magicdtobuilder.utils.MagicMethodDtoBuilderUtils;
 import io.github.bigtows.plugin.magicdtobuilder.utils.MethodReferenceUtils;
+import io.github.bigtows.plugin.magicdtobuilder.utils.PhpDoceHelper;
 import io.github.bigtows.plugin.magicdtobuilder.utils.PhpTypedElementMagicDtoBuilderUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,7 +81,9 @@ public class DtoBuilderTypeProvider implements PhpTypeProvider3 {
                 methodReference.resolve() != null) {
             Method method = (Method) methodReference.resolve();
             if (method.getContainingClass().getFQN().equals(settings.getSignatureMagicDtoBuilder()) &&
-                    method.getDeclaredType().toString().equals(settings.getSignatureAbstractDto())) {
+                    (method.getDeclaredType().toString().equals(settings.getSignatureAbstractDto())
+                            || PhpDoceHelper.equalsReturnPhpTypeInMethod(method, settings.getSignatureAbstractDto())
+                    )) {
                 phpType = PhpType.builder().add(PhpTypedElementMagicDtoBuilderUtils.getBuilderDtoNameByPhpTypedElement(
                         MethodReferenceUtils.getPhpTypedElementAtRootByMethodReference(methodReference)
                 )).build();
